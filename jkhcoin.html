@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="ru">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+	<meta name="theme-color" content="#080807">
+	<title>ЖКХ Коин</title>
+	<style>
+		:root {
+			color-scheme: dark;
+			font-family: "Trebuchet MS", "Arial Rounded MT Bold", sans-serif;
+			color: #f5f2e9;
+			background: #080807;
+			font-synthesis: none;
+			--muted: #89877f;
+			--accent: #ffcb16;
+		}
+
+		* { box-sizing: border-box; }
+		body { min-width: 320px; min-height: 100vh; min-height: 100svh; margin: 0; background: #080807; }
+		button { font: inherit; }
+
+		.app {
+			position: relative;
+			display: flex;
+			flex-direction: column;
+			width: min(100%, 430px);
+			height: 100vh;
+			height: 100svh;
+			min-height: 540px;
+			margin-inline: auto;
+			padding: max(24px, env(safe-area-inset-top)) 20px max(12px, env(safe-area-inset-bottom));
+			overflow: hidden;
+			isolation: isolate;
+		}
+
+		.app::before {
+			position: absolute;
+			z-index: -1;
+			top: 38%;
+			left: 50%;
+			width: min(92vw, 390px);
+			aspect-ratio: 1;
+			border: 1px solid #ffc9140b;
+			border-radius: 50%;
+			content: "";
+			transform: translate(-50%, -50%);
+			box-shadow: 0 0 110px #ffae0810, inset 0 0 70px #ffcc0807;
+			pointer-events: none;
+		}
+
+		.scene { display: none; flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none; }
+		.scene::-webkit-scrollbar { display: none; }
+		.scene.is-active { display: flex; flex-direction: column; animation: rise .3s both; }
+		.header { display: flex; flex-direction: column; align-items: center; padding: 5px 48px 0; text-align: center; }
+		.brand { display: flex; align-items: center; gap: 8px; color: #b7b4a9; font-size: 11px; font-weight: 700; letter-spacing: 2.4px; text-transform: uppercase; }
+		.brand-mark { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px #ffca1680; }
+		.total { margin-top: 13px; color: #fffdf6; font-size: clamp(48px, 14vw, 66px); font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+		.total-label { margin-top: 8px; color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; }
+		.profile-trigger { position: absolute; z-index: 4; top: max(20px, env(safe-area-inset-top)); right: 20px; display: grid; width: 44px; aspect-ratio: 1; place-items: center; padding: 0; overflow: hidden; border: 1px solid #49463b; border-radius: 50%; background: #171611; color: #fff; cursor: pointer; }
+		.profile-trigger img, .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+		.avatar-fallback { position: relative; display: grid; width: 100%; height: 100%; place-items: center; overflow: hidden; background: linear-gradient(145deg, #55503d, #24221b); color: #fff1bd; font-size: 11px; font-weight: 800; }
+		.avatar-fallback::before { position: absolute; top: 8px; width: 11px; height: 11px; border-radius: 50%; background: #f3d982; content: ""; }
+		.avatar-fallback::after { position: absolute; bottom: -7px; width: 27px; height: 20px; border-radius: 50% 50% 0 0; background: #f3d982; content: ""; }
+
+		.play-area { position: relative; display: grid; flex: 1; min-height: 220px; place-items: center; }
+		.coin-button {
+			position: relative;
+			display: grid;
+			width: min(78vw, 310px);
+			aspect-ratio: 1;
+			place-items: center;
+			padding: 0;
+			border: 0;
+			border-radius: 50%;
+			background: transparent;
+			cursor: pointer;
+			-webkit-tap-highlight-color: transparent;
+			transition: transform .16s cubic-bezier(.2, .8, .2, 1), filter .2s ease;
+		}
+		.coin-button::before { position: absolute; inset: 9%; border: 1px solid #ffc9161c; border-radius: 50%; content: ""; animation: pulse 2.6s ease-in-out infinite; }
+		.coin-image { display: block; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; filter: drop-shadow(0 13px 30px #ffb60026); user-select: none; -webkit-user-drag: none; }
+		.coin-button:hover { filter: brightness(1.06); }
+		.coin-button:active, .coin-button.pressed { transform: scale(.93); }
+		.coin-button:disabled { cursor: not-allowed; filter: grayscale(.45) brightness(.75); }
+		.coin-button:focus-visible, .utility:focus-visible { outline: 2px solid var(--accent); outline-offset: 5px; }
+		.tap-effect { position: absolute; z-index: 2; color: #fff4ad; font-size: 17px; font-weight: 800; pointer-events: none; animation: float-up .7s ease-out forwards; }
+
+		.footer { display: flex; flex-direction: column; align-items: center; padding-bottom: 14px; }
+		.energy { width: min(100%, 300px); }
+		.energy-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 9px; color: #aaa79d; font-size: 10px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; }
+		.energy-count { color: #f1eee4; font-size: 12px; font-variant-numeric: tabular-nums; letter-spacing: 0; }
+		.energy-track { height: 4px; overflow: hidden; border-radius: 99px; background: #2e2c25; }
+		.energy-fill { width: 100%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #f39809, #ffdb2e); box-shadow: 0 0 12px #ffc91455; transition: width .25s ease; }
+		.recovery { min-height: 14px; margin-top: 8px; color: #747168; font-size: 10px; text-align: center; font-variant-numeric: tabular-nums; }
+		.bottom-nav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; padding-top: 10px; border-top: 1px solid #27251f; }
+		.nav-button { display: flex; min-width: 0; height: 84px; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 4px; border: 1px solid #302e27; border-radius: 13px; background: #12110f; color: #aaa79d; cursor: pointer; transition: border-color .18s ease, background .18s ease, transform .18s ease; -webkit-tap-highlight-color: transparent; }
+		.nav-button:hover { border-color: #625737; background: #191711; }
+		.nav-button:active { transform: scale(.97); }
+		.nav-button.is-active { border-color: #8d7428; background: #211d10; color: #ffda56; }
+		.nav-button img { display: block; width: 58px; height: 58px; border-radius: 8px; object-fit: contain; }
+		.nav-icon { display: block; width: 38px; height: 38px; fill: none; stroke: #e8bd45; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; filter: drop-shadow(0 2px 8px #f0bf3233); }
+		.nav-button.is-active .nav-icon { stroke: #ffdf71; }
+		.nav-label { max-width: 100%; overflow: hidden; font-size: 9px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+		.profile-scene { align-items: center; padding: 28px 8px; text-align: center; }
+		.scene-heading { margin: 0; color: #fffdf6; font-size: 25px; font-weight: 800; }
+		.scene-subtitle { margin: 8px 0 0; color: var(--muted); font-size: 12px; }
+		.scene-hero { display: grid; flex: 1; min-height: 220px; place-items: center; padding: 24px 0; }
+		.scene-hero img { display: block; width: min(62vw, 250px); aspect-ratio: 1; border-radius: 22px; object-fit: contain; filter: drop-shadow(0 14px 36px #0008); }
+		.bank-poster { display: flex; flex-direction: column; align-items: center; gap: 14px; width: 100%; margin: auto 0; padding: 24px 0; }
+		.bank-poster img { display: block; width: min(100%, 390px); aspect-ratio: 3 / 2; border: 1px solid #ffffff20; border-radius: 8px; object-fit: cover; box-shadow: 0 14px 36px #0008; }
+		.bank-caption { margin: 0; color: #f0dfb8; font-size: 15px; font-weight: 700; line-height: 1.6; text-align: center; }
+		.bank-caption span { display: block; color: #aaa79d; font-size: 13px; font-weight: 500; font-style: italic; }
+		.scene-empty { margin: 0; color: #a7a399; font-size: 13px; }
+		.profile-avatar { display: grid; width: 104px; aspect-ratio: 1; place-items: center; margin: 10px auto 22px; overflow: hidden; border: 2px solid #ffcb16; border-radius: 50%; background: #171611; }
+		.profile-avatar .avatar-fallback::before { top: 18px; width: 26px; height: 26px; }
+		.profile-avatar .avatar-fallback::after { bottom: -12px; width: 64px; height: 46px; }
+		.profile-name { margin: 0; color: #fffdf6; font-size: 21px; font-weight: 800; }
+		.profile-username { margin: 5px 0 24px; color: var(--muted); font-size: 13px; }
+		.player-id { width: min(100%, 330px); padding: 18px; border: 1px solid #35332d; border-radius: 14px; background: #12110f; }
+		.player-id-label { color: #aaa79d; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+		.player-id-value { margin-top: 8px; color: var(--accent); font-size: 24px; font-weight: 800; letter-spacing: 2px; font-variant-numeric: tabular-nums; }
+		.profile-stats { display: flex; width: min(100%, 330px); justify-content: space-between; margin-top: 12px; padding: 17px 18px; border: 1px solid #302e27; border-radius: 12px; color: #aaa79d; font-size: 12px; }
+		.profile-stats strong { color: #fffdf6; font-variant-numeric: tabular-nums; }
+		.wallet-panel { width: min(100%, 330px); margin-top: 12px; padding: 16px; border: 1px solid #35332d; border-radius: 12px; background: #12110f; text-align: left; }
+		.wallet-heading { margin: 0 0 10px; color: #f5f2e9; font-size: 13px; font-weight: 700; }
+		.wallet-status { margin: 0; color: #aaa79d; font-size: 11px; line-height: 1.5; }
+		.wallet-address { margin: 8px 0 0; overflow-wrap: anywhere; color: #e8c85b; font-size: 11px; }
+		.wallet-connect { margin-top: 12px; }
+		.wallet-disconnect { display: none; min-height: 38px; margin-top: 10px; padding: 0 12px; border: 1px solid #48453b; border-radius: 9px; background: #1b1a16; color: #ddd7c8; font: inherit; font-size: 11px; cursor: pointer; }
+		.wallet-disconnect.is-visible { display: inline-flex; align-items: center; }
+		.promo-scene { padding: 8px 0 16px; }
+		.promo-title { margin: 0; color: #fffdf6; font-size: 24px; font-weight: 800; }
+		.promo-description { margin: 7px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+		.promo-balance { margin-top: 18px; padding: 13px 15px; border: 1px solid #35332d; border-radius: 12px; background: #12110f; color: #aaa79d; font-size: 12px; }
+		.promo-balance strong { margin-left: 6px; color: var(--accent); font-size: 16px; font-variant-numeric: tabular-nums; }
+		.gift-panel { display: flex; flex-direction: column; align-items: center; gap: 16px; margin: auto 0; padding: 24px 18px; border: 1px solid #343027; border-radius: 16px; background: linear-gradient(145deg, #19170f, #100f0d); text-align: center; }
+		.gift-image { display: block; width: min(48vw, 170px); aspect-ratio: 1; border-radius: 18px; object-fit: cover; }
+		.gift-amount { margin: 0; color: #ffda56; font-size: 32px; font-weight: 800; }
+		.gift-copy { margin: -10px 0 0; color: #aaa79d; font-size: 12px; }
+		.action-button { min-height: 48px; padding: 0 22px; border: 0; border-radius: 12px; background: var(--accent); color: #17140a; font-size: 13px; font-weight: 800; cursor: pointer; }
+		.action-button:disabled { border: 1px solid #48453b; background: #24231f; color: #88857b; cursor: default; }
+		.referral-link { display: flex; gap: 8px; margin-top: 16px; }
+		.referral-link input { min-width: 0; flex: 1; padding: 0 11px; border: 1px solid #35332d; border-radius: 10px; background: #0c0c0b; color: #e8e4d8; font: inherit; font-size: 11px; }
+		.copy-button { min-height: 44px; padding: 0 14px; border: 1px solid #665523; border-radius: 10px; background: #211d10; color: #ffda56; font-size: 12px; font-weight: 700; cursor: pointer; }
+		.copy-status { min-height: 16px; margin: 8px 0 0; color: #c6b36f; font-size: 11px; }
+
+		@keyframes rise { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
+		@keyframes pulse { 0%, 100% { transform: scale(.97); opacity: .4; } 50% { transform: scale(1.04); opacity: .9; } }
+		@keyframes float-up { 0% { opacity: 0; transform: translateY(5px) scale(.8); } 20% { opacity: 1; } 100% { opacity: 0; transform: translateY(-48px) scale(1.08); } }
+
+		@media (max-height: 650px) {
+			.app { padding-top: max(17px, env(safe-area-inset-top)); padding-bottom: max(14px, env(safe-area-inset-bottom)); }
+			.total { margin-top: 8px; font-size: 48px; }
+			.play-area { min-height: 180px; }
+			.coin-button { width: min(56vh, 240px); }
+			.footer { padding-bottom: 8px; }
+			.nav-button { height: 74px; }
+			.nav-button img, .nav-glyph { width: 49px; height: 49px; }
+		}
+		@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; } }
+	</style>
+</head>
+<body>
+	<main class="app">
+		<button class="profile-trigger" id="profileTrigger" type="button" aria-label="Открыть профиль">
+			<span class="avatar-fallback" id="avatarFallback" aria-hidden="true"></span>
+			<img id="avatarImage" alt="Аватар Telegram" style="display: none">
+		</button>
+
+		<section class="scene is-active" id="homeScene" data-scene="home" aria-label="Главная">
+			<header class="header">
+				<div class="brand"><span class="brand-mark" aria-hidden="true"></span>ЖКХ Коин</div>
+				<div class="total" id="total" aria-live="polite">0</div>
+				<div class="total-label">Всего кликов</div>
+			</header>
+			<section class="play-area" id="playArea" aria-label="Игровая кнопка">
+				<button class="coin-button" id="coinButton" type="button" aria-label="Нажать на монету">
+					<img class="coin-image" src="photo_2025-09-05_17-02-22.jpg" alt="Жёлтая монета ЖКХ" draggable="false">
+				</button>
+			</section>
+			<footer class="footer">
+				<section class="energy" aria-label="Запас кликов">
+					<div class="energy-top"><span>Энергия</span><span class="energy-count" id="energyCount">1000 / 1000</span></div>
+					<div class="energy-track" id="energyTrack" role="progressbar" aria-label="Остаток кликов" aria-valuemin="0" aria-valuemax="1000" aria-valuenow="1000">
+						<div class="energy-fill" id="energyFill"></div>
+					</div>
+					<div class="recovery" id="recovery">Полное восстановление за 1 час</div>
+				</section>
+			</footer>
+		</section>
+
+		<section class="scene promo-scene" id="referralsScene" data-scene="referrals" aria-label="Рефералы">
+			<h1 class="promo-title">Рефералы</h1>
+			<p class="promo-description">Приглашайте друзей по своей ссылке.<br>За каждые 10 их тапов начисляется 0,001 коина.</p>
+			<div class="promo-balance">Баланс <strong class="coins-balance">0</strong> коинов</div>
+			<div class="referral-link">
+				<input id="referralUrl" type="text" readonly aria-label="Ваша реферальная ссылка">
+				<button class="copy-button" id="copyReferral" type="button">Копировать</button>
+			</div>
+			<p class="copy-status" id="copyStatus" aria-live="polite"></p>
+		</section>
+
+		<section class="scene" id="bankScene" data-scene="bank" aria-label="Международный некоммерческий банк">
+			<h1 class="scene-heading">Международный банк</h1>
+			<p class="scene-subtitle">Некоммерческий банк для международных инициатив</p>
+			<div class="bank-poster">
+				<img src="photo_2026-10-28_18-50-34.jpg" alt="Плакат ЖКХ Коин: вместе строим будущее">
+				<p class="bank-caption">Работаем не покладая рук<span>Working tirelessly</span></p>
+			</div>
+		</section>
+
+		<section class="scene promo-scene" id="giftsScene" data-scene="gifts" aria-label="Ежедневный подарок">
+			<h1 class="promo-title">Ежедневный подарок</h1>
+			<p class="promo-description">Заходи каждый день за коинами</p>
+			<div class="promo-balance">Баланс <strong class="coins-balance">0</strong> коинов</div>
+			<div class="gift-panel">
+				<img class="gift-image" src="photo_2026-10-28_19-04-15.jpg" alt="Иконка ежедневного подарка">
+				<p class="gift-amount">+10</p>
+				<p class="gift-copy" id="giftStatus">Коины доступны один раз в день</p>
+				<button class="action-button" id="claimGift" type="button">Забрать 10 коинов</button>
+			</div>
+		</section>
+
+		<section class="scene profile-scene" id="profileScene" data-scene="profile" aria-label="Профиль игрока">
+			<div class="profile-avatar">
+				<span class="avatar-fallback" id="profileAvatarFallback" aria-hidden="true"></span>
+				<img id="profileAvatarImage" alt="Аватар Telegram" style="display: none">
+			</div>
+			<h1 class="profile-name" id="profileName">Игрок</h1>
+			<p class="profile-username" id="profileUsername">Профиль игрока</p>
+			<div class="player-id">
+				<div class="player-id-label">ID игрока</div>
+				<div class="player-id-value" id="playerId">ABC0000000</div>
+			</div>
+			<div class="profile-stats"><span>Всего кликов</span><strong id="profileTotal">0</strong></div>
+			<div class="profile-stats"><span>Баланс коинов</span><strong class="coins-balance">0</strong></div>
+			<section class="wallet-panel" aria-label="TON-кошелёк">
+				<h2 class="wallet-heading">TON-кошелёк</h2>
+				<p class="wallet-status" id="walletStatus" aria-live="polite">Проверяем возможность подключения…</p>
+				<p class="wallet-address" id="walletAddress" hidden></p>
+				<div class="wallet-connect" id="tonConnectButton"></div>
+				<button class="wallet-disconnect" id="walletDisconnect" type="button">Отключить кошелёк</button>
+			</section>
+		</section>
+
+		<nav class="bottom-nav" aria-label="Разделы">
+			<button class="nav-button is-active" type="button" data-target="home" aria-label="Главная" aria-current="page">
+				<svg class="nav-icon" viewBox="0 0 40 40" aria-hidden="true"><path d="m6 18 14-12 14 12"/><path d="M10 16v17h20V16"/><path d="M17 33V22h6v11"/></svg><span class="nav-label">Главная</span>
+			</button>
+			<button class="nav-button" type="button" data-target="referrals" aria-label="Рефералы">
+				<svg class="nav-icon" viewBox="0 0 40 40" aria-hidden="true"><circle cx="15" cy="13" r="5"/><path d="M5.5 31v-2a9.5 9.5 0 0 1 19 0v2z"/><path d="M25 8.5a5 5 0 0 1 0 9.5M28 22a8 8 0 0 1 6.5 7.8V31h-6"/></svg><span class="nav-label">Рефералы</span>
+			</button>
+			<button class="nav-button" type="button" data-target="bank" aria-label="Международный некоммерческий банк">
+				<svg class="nav-icon" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="16"/><path d="M4 20h32M20 4a23 23 0 0 1 0 32M20 4a23 23 0 0 0 0 32M8 11h24M8 29h24"/><path d="m12 18 8-5 8 5M14 19v7M19 19v7M24 19v7M11 28h18"/></svg><span class="nav-label">Банк</span>
+			</button>
+			<button class="nav-button" type="button" data-target="gifts" aria-label="Ежедневный подарок">
+				<svg class="nav-icon" viewBox="0 0 40 40" aria-hidden="true"><path d="M7 18h26v17H7zM5 12h30v7H5zM20 12v23"/><path d="M20 12h-7a4 4 0 1 1 4-4c0 2.2 3 4 3 4ZM20 12h7a4 4 0 1 0-4-4c0 2.2-3 4-3 4Z"/></svg><span class="nav-label">Подарок</span>
+			</button>
+		</nav>
+	</main>
+
+	<script src="https://telegram.org/js/telegram-web-app.js"></script>
+	<script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+	<script>
+		(() => {
+			const CAPACITY = 1000;
+			const RECHARGE_MS = 3600;
+			const STORAGE_KEY = "zhkh-clicker-state-v1";
+			const totalElement = document.querySelector("#total");
+			const energyCount = document.querySelector("#energyCount");
+			const energyFill = document.querySelector("#energyFill");
+			const energyTrack = document.querySelector("#energyTrack");
+			const recovery = document.querySelector("#recovery");
+			const coinButton = document.querySelector("#coinButton");
+			const playArea = document.querySelector("#playArea");
+			const profileTotal = document.querySelector("#profileTotal");
+			const claimGiftButton = document.querySelector("#claimGift");
+			const giftStatus = document.querySelector("#giftStatus");
+			const walletStatus = document.querySelector("#walletStatus");
+			const walletAddress = document.querySelector("#walletAddress");
+			const walletDisconnect = document.querySelector("#walletDisconnect");
+			const telegramApp = window.Telegram?.WebApp;
+			const telegramUser = telegramApp?.initDataUnsafe?.user;
+			const scenes = [...document.querySelectorAll(".scene")];
+			const navButtons = [...document.querySelectorAll(".nav-button")];
+
+			function createPlayerId() {
+				const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+				const randomValues = new Uint32Array(10);
+				if (window.crypto?.getRandomValues) window.crypto.getRandomValues(randomValues);
+				else randomValues.forEach((_, index) => { randomValues[index] = Math.floor(Math.random() * 0xffffffff); });
+				const letters = Array.from(randomValues.slice(0, 3), value => alphabet[value % alphabet.length]).join("");
+				const digits = Array.from(randomValues.slice(3), value => String(value % 10)).join("");
+				return `${letters}${digits}`;
+			}
+
+			function getPlayerId() {
+				try {
+					const existing = localStorage.getItem("zhkh-player-id");
+					if (/^[A-Z]{3}\d{7}$/.test(existing || "")) return existing;
+					const created = createPlayerId();
+					localStorage.setItem("zhkh-player-id", created);
+					return created;
+				} catch { return createPlayerId(); }
+			}
+
+			function setAvatar(imageId, fallbackId) {
+				if (!telegramUser?.photo_url) return;
+				const image = document.querySelector(imageId);
+				const fallback = document.querySelector(fallbackId);
+				image.src = telegramUser.photo_url;
+				image.addEventListener("load", () => { image.style.display = "block"; fallback.style.display = "none"; }, { once: true });
+			}
+
+			async function setupTonConnect() {
+				if (window.location.protocol !== "https:") {
+					walletStatus.textContent = "Для подключения кошелька опубликуйте приложение на HTTPS-сайте.";
+					return;
+				}
+				if (!window.TON_CONNECT_UI?.TonConnectUI) {
+					walletStatus.textContent = "Не удалось загрузить TON Connect. Проверьте подключение к интернету.";
+					return;
+				}
+
+				const manifestUrl = new URL("tonconnect-manifest.json", window.location.href).toString();
+				try {
+					const response = await fetch(manifestUrl);
+					if (!response.ok) throw new Error("TON Connect manifest is unavailable");
+					const manifest = await response.json();
+					if (!manifest.url?.startsWith("https://") || !manifest.iconUrl?.startsWith("https://") || manifest.url.includes("YOUR-DOMAIN")) {
+						throw new Error("TON Connect manifest needs a public HTTPS domain");
+					}
+					const tonConnectUI = new window.TON_CONNECT_UI.TonConnectUI({
+						manifestUrl,
+						buttonRootId: "tonConnectButton"
+					});
+					tonConnectUI.uiOptions = { language: "ru", uiPreferences: { theme: "DARK" } };
+					tonConnectUI.onStatusChange(wallet => {
+						const address = wallet?.account?.address;
+						walletStatus.textContent = wallet ? "Кошелёк подключён" : "Кошелёк не подключён";
+						walletAddress.hidden = !address;
+						walletAddress.textContent = address ? `Адрес: ${address}` : "";
+						walletDisconnect.classList.toggle("is-visible", Boolean(wallet));
+					});
+					walletDisconnect.addEventListener("click", () => tonConnectUI.disconnect());
+				} catch {
+					walletStatus.textContent = "Подключение станет доступно после публикации HTTPS-сайта и настройки tonconnect-manifest.json.";
+				}
+			}
+
+			function openScene(sceneName) {
+				scenes.forEach(scene => scene.classList.toggle("is-active", scene.dataset.scene === sceneName));
+				navButtons.forEach(button => {
+					const selected = button.dataset.target === sceneName;
+					button.classList.toggle("is-active", selected);
+					if (selected) button.setAttribute("aria-current", "page");
+					else button.removeAttribute("aria-current");
+				});
+				if (sceneName === "profile") telegramApp?.BackButton?.show();
+				else telegramApp?.BackButton?.hide();
+			}
+
+			function loadState() {
+				try {
+					const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+					if (saved && Number.isFinite(saved.energy) && Number.isFinite(saved.total) && Number.isFinite(saved.updatedAt)) {
+						return {
+							energy: Math.max(0, Math.min(CAPACITY, Math.floor(saved.energy))),
+							total: Math.max(0, Math.floor(saved.total)),
+							coins: Number.isFinite(saved.coins) ? Math.max(0, saved.coins) : 0,
+							updatedAt: saved.updatedAt
+						};
+					}
+				} catch { /* Start with a full reserve if saved data is unavailable. */ }
+				return { energy: CAPACITY, total: 0, coins: 0, updatedAt: Date.now() };
+			}
+
+			let state = loadState();
+
+			function saveState() {
+				try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch { /* Keep this session usable if storage is blocked. */ }
+			}
+
+			function recharge(now) {
+				const elapsed = Math.max(0, now - state.updatedAt);
+				const restored = Math.floor(elapsed / RECHARGE_MS);
+				if (restored > 0) {
+					state.energy = Math.min(CAPACITY, state.energy + restored);
+					state.updatedAt = state.energy === CAPACITY ? now : state.updatedAt + restored * RECHARGE_MS;
+				}
+				if (state.energy === CAPACITY) state.updatedAt = now;
+			}
+
+			function formatTime(milliseconds) {
+				const totalSeconds = Math.ceil(milliseconds / 1000);
+				const minutes = Math.floor(totalSeconds / 60);
+				const seconds = totalSeconds % 60;
+				return `${minutes}:${String(seconds).padStart(2, "0")}`;
+			}
+
+			function render() {
+				const now = Date.now();
+				recharge(now);
+				totalElement.textContent = state.total.toLocaleString("ru-RU");
+				profileTotal.textContent = state.total.toLocaleString("ru-RU");
+				document.querySelectorAll(".coins-balance").forEach(element => {
+					element.textContent = state.coins.toLocaleString("ru-RU", { minimumFractionDigits: 0, maximumFractionDigits: 3 });
+				});
+				energyCount.textContent = `${state.energy} / ${CAPACITY}`;
+				energyFill.style.width = `${(state.energy / CAPACITY) * 100}%`;
+				energyTrack.setAttribute("aria-valuenow", String(state.energy));
+				coinButton.disabled = state.energy === 0;
+				const giftClaimed = localStorage.getItem("zhkh-daily-gift-date") === getLocalDateKey(now);
+				claimGiftButton.disabled = giftClaimed;
+				claimGiftButton.textContent = giftClaimed ? "Уже получено сегодня" : "Забрать 10 коинов";
+				giftStatus.textContent = giftClaimed ? "Возвращайся завтра за новым подарком" : "Коины доступны один раз в день";
+				recovery.textContent = state.energy === CAPACITY
+					? "Полное восстановление за 1 час"
+					: `+1 клик через ${formatTime(RECHARGE_MS - (now - state.updatedAt) % RECHARGE_MS)}`;
+				saveState();
+			}
+
+			function getLocalDateKey(timestamp) {
+				const date = new Date(timestamp);
+				const year = date.getFullYear();
+				const month = String(date.getMonth() + 1).padStart(2, "0");
+				const day = String(date.getDate()).padStart(2, "0");
+				return `${year}-${month}-${day}`;
+			}
+
+			function showTapEffect() {
+				const effect = document.createElement("span");
+				effect.className = "tap-effect";
+				effect.textContent = "+1";
+				effect.style.left = `${35 + Math.random() * 30}%`;
+				effect.style.top = `${38 + Math.random() * 24}%`;
+				playArea.append(effect);
+				effect.addEventListener("animationend", () => effect.remove(), { once: true });
+				coinButton.classList.add("pressed");
+				window.setTimeout(() => coinButton.classList.remove("pressed"), 130);
+			}
+
+			coinButton.addEventListener("click", () => {
+				recharge(Date.now());
+				if (state.energy <= 0) return;
+				state.energy -= 1;
+				state.total += 1;
+				showTapEffect();
+				render();
+			});
+
+			claimGiftButton.addEventListener("click", () => {
+				const today = getLocalDateKey(Date.now());
+				if (localStorage.getItem("zhkh-daily-gift-date") === today) return;
+				state.coins = Math.round((state.coins + 10) * 1000) / 1000;
+				localStorage.setItem("zhkh-daily-gift-date", today);
+				saveState();
+				render();
+			});
+
+			const playerId = getPlayerId();
+			document.querySelector("#playerId").textContent = playerId;
+			const referralUrl = new URL("jkhcoin", window.location.href);
+			referralUrl.searchParams.set("ref", playerId);
+			document.querySelector("#referralUrl").value = window.location.protocol === "file:"
+				? `jkhcoin?${referralUrl.searchParams.toString()}`
+				: referralUrl.toString();
+			document.querySelector("#profileName").textContent = telegramUser
+				? [telegramUser.first_name, telegramUser.last_name].filter(Boolean).join(" ") || telegramUser.username || "Игрок"
+				: "Игрок";
+			document.querySelector("#profileUsername").textContent = telegramUser?.username
+				? `@${telegramUser.username}`
+				: telegramUser ? "Профиль Telegram" : "Локальный профиль";
+			setAvatar("#avatarImage", "#avatarFallback");
+			setAvatar("#profileAvatarImage", "#profileAvatarFallback");
+			navButtons.forEach(button => button.addEventListener("click", () => openScene(button.dataset.target)));
+			document.querySelector("#profileTrigger").addEventListener("click", () => openScene("profile"));
+			document.querySelector("#copyReferral").addEventListener("click", async () => {
+				const input = document.querySelector("#referralUrl");
+				const status = document.querySelector("#copyStatus");
+				try {
+					await navigator.clipboard.writeText(input.value);
+				} catch {
+					input.focus();
+					input.select();
+					document.execCommand("copy");
+				}
+				status.textContent = "Ссылка скопирована";
+			});
+			telegramApp?.BackButton?.onClick(() => openScene("home"));
+			telegramApp?.ready();
+			telegramApp?.expand();
+			setupTonConnect();
+
+			render();
+			window.setInterval(render, 250);
+		})();
+	</script>
+</body>
+</html>
