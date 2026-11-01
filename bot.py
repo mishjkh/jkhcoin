@@ -17,7 +17,7 @@ from telegram.ext import Application, CommandHandler, ContextTypes
 
 WEB_APP_URL = "https://mishjkh.github.io/jkhcoin/"
 WELCOME_IMAGE_URL = (
-    "https://mishjkh.github.io/jkhcoin/photo_2026-10-28_18-50-34.jpg"
+    "https://raw.githubusercontent.com/mishjkh/jkhcoin/main/photo_2026-11-01_18-17-22.jpg"
 )
 
 telegram_application: Application | None = None
