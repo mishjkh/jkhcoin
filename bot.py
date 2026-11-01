@@ -1,3 +1,4 @@
+import hashlib
 import hmac
 import os
 from contextlib import asynccontextmanager
@@ -20,6 +21,13 @@ WELCOME_IMAGE_URL = (
 )
 
 telegram_application: Application | None = None
+
+
+def get_webhook_secret() -> str:
+    secret = os.environ.get("WEBHOOK_SECRET")
+    if not secret:
+        raise RuntimeError("WEBHOOK_SECRET must be configured as a hosting secret.")
+    return hashlib.sha256(secret.encode("utf-8")).hexdigest()
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -49,14 +57,12 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     global telegram_application
 
     token = os.environ.get("BOT_TOKEN")
-    webhook_secret = os.environ.get("WEBHOOK_SECRET")
     public_url = os.environ.get("RENDER_EXTERNAL_URL", "").rstrip("/")
     parsed_url = urlsplit(public_url)
 
     if not token:
         raise RuntimeError("BOT_TOKEN must be configured as a hosting secret.")
-    if not webhook_secret:
-        raise RuntimeError("WEBHOOK_SECRET must be configured as a hosting secret.")
+    webhook_secret = get_webhook_secret()
     if parsed_url.scheme != "https" or not parsed_url.netloc:
         raise RuntimeError("RENDER_EXTERNAL_URL must be the public HTTPS service URL.")
 
@@ -93,7 +99,7 @@ async def telegram_webhook(
 ) -> dict[str, bool]:
     if not hmac.compare_digest(
         x_telegram_bot_api_secret_token or "",
-        os.environ.get("WEBHOOK_SECRET", ""),
+        get_webhook_secret(),
     ):
         raise HTTPException(status_code=403, detail="Invalid webhook secret")
     if telegram_application is None:
