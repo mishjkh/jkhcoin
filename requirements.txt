@@ -1,1 +1,3 @@
+fastapi>=0.110,<1
 python-telegram-bot>=21,<23
+uvicorn[standard]>=0.29,<1
