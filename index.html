@@ -33,6 +33,8 @@
 			overflow: hidden;
 			isolation: isolate;
 		}
+		.cloud-notice { position: absolute; z-index: 20; inset: 0; display: grid; place-items: center; padding: 32px; background: #080807f5; color: #f5f2e9; font-size: 15px; line-height: 1.6; text-align: center; }
+		.cloud-notice[hidden] { display: none; }
 
 		.app::before {
 			position: absolute;
@@ -57,6 +59,9 @@
 		.brand-mark { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px #ffca1680; }
 		.total { margin-top: 13px; color: #fffdf6; font-size: clamp(48px, 14vw, 66px); font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
 		.total-label { margin-top: 8px; color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; }
+		.player-badge { position: absolute; z-index: 3; top: max(20px, env(safe-area-inset-top)); left: 20px; display: flex; max-width: calc(100% - 88px); flex-direction: column; gap: 4px; }
+		.player-nickname { max-width: 100%; overflow: hidden; color: #f5f2e9; font-size: 13px; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
+		.player-level { color: #ffda56; font-size: 10px; font-weight: 700; letter-spacing: .5px; }
 		.profile-trigger { position: absolute; z-index: 4; top: max(20px, env(safe-area-inset-top)); right: 20px; display: grid; width: 44px; aspect-ratio: 1; place-items: center; padding: 0; overflow: hidden; border: 1px solid #49463b; border-radius: 50%; background: #171611; color: #fff; cursor: pointer; }
 		.profile-trigger img, .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
 		.avatar-fallback { position: relative; display: grid; width: 100%; height: 100%; place-items: center; overflow: hidden; background: linear-gradient(145deg, #55503d, #24221b); color: #fff1bd; font-size: 11px; font-weight: 800; }
@@ -65,7 +70,6 @@
 
 		.play-area { position: relative; display: grid; flex: 1; min-height: 220px; place-items: center; }
 		.coin-button {
-			touch-action: manipulation;
 			position: relative;
 			display: grid;
 			width: min(78vw, 310px);
@@ -76,6 +80,7 @@
 			border-radius: 50%;
 			background: transparent;
 			cursor: pointer;
+			touch-action: manipulation;
 			-webkit-tap-highlight-color: transparent;
 			transition: transform .16s cubic-bezier(.2, .8, .2, 1), filter .2s ease;
 		}
@@ -94,8 +99,8 @@
 		.energy-track { height: 4px; overflow: hidden; border-radius: 99px; background: #2e2c25; }
 		.energy-fill { width: 100%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #f39809, #ffdb2e); box-shadow: 0 0 12px #ffc91455; transition: width .25s ease; }
 		.recovery { min-height: 14px; margin-top: 8px; color: #747168; font-size: 10px; text-align: center; font-variant-numeric: tabular-nums; }
-		.bottom-nav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; padding-top: 10px; border-top: 1px solid #27251f; }
-		.nav-button { display: flex; min-width: 0; height: 84px; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 4px; border: 1px solid #302e27; border-radius: 13px; background: #12110f; color: #aaa79d; cursor: pointer; transition: border-color .18s ease, background .18s ease, transform .18s ease; -webkit-tap-highlight-color: transparent; }
+		.bottom-nav { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; padding-top: 10px; border-top: 1px solid #27251f; }
+		.nav-button { display: flex; min-width: 0; height: 76px; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 4px 2px; border: 1px solid #302e27; border-radius: 13px; background: #12110f; color: #aaa79d; cursor: pointer; transition: border-color .18s ease, background .18s ease, transform .18s ease; -webkit-tap-highlight-color: transparent; }
 		.nav-button:hover { border-color: #625737; background: #191711; }
 		.nav-button:active { transform: scale(.97); }
 		.nav-button.is-active { border-color: #8d7428; background: #211d10; color: #ffda56; }
@@ -108,10 +113,32 @@
 		.scene-subtitle { margin: 8px 0 0; color: var(--muted); font-size: 12px; }
 		.scene-hero { display: grid; flex: 1; min-height: 220px; place-items: center; padding: 24px 0; }
 		.scene-hero img { display: block; width: min(62vw, 250px); aspect-ratio: 1; border-radius: 22px; object-fit: contain; filter: drop-shadow(0 14px 36px #0008); }
-		.bank-poster { display: flex; flex-direction: column; align-items: center; gap: 14px; width: 100%; margin: auto 0; padding: 24px 0; }
-		.bank-poster img { display: block; width: min(100%, 390px); aspect-ratio: 3 / 2; border: 1px solid #ffffff20; border-radius: 8px; object-fit: cover; box-shadow: 0 14px 36px #0008; }
-		.bank-caption { margin: 0; color: #f0dfb8; font-size: 15px; font-weight: 700; line-height: 1.6; text-align: center; }
-		.bank-caption span { display: block; color: #aaa79d; font-size: 13px; font-weight: 500; font-style: italic; }
+		.bank-card { position: relative; flex-shrink: 0; width: min(100%, 390px); aspect-ratio: 3 / 2; margin: 22px auto 0; overflow: hidden; border: 1px solid #a48a43; border-radius: 18px; background: #171611; box-shadow: 0 18px 42px #000a, 0 0 24px #d6ad3820; }
+		.bank-card-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+		.bank-card-shade { position: absolute; inset: 0; background: linear-gradient(180deg, #0000 29%, #090b0de0 68%, #090b0df5 100%); }
+		.bank-card-badge { position: absolute; top: 12px; right: 12px; padding: 5px 8px; border: 1px solid #fff5; border-radius: 6px; background: #10110db8; color: #f4e3a9; font-size: 8px; font-weight: 800; letter-spacing: 1px; }
+		.bank-card-details { position: absolute; right: 16px; bottom: 14px; left: 16px; }
+		.bank-card-number { color: #fff8df; font-size: clamp(17px, 5.2vw, 23px); font-weight: 700; letter-spacing: clamp(2px, 1vw, 4px); font-variant-numeric: tabular-nums; text-shadow: 0 2px 6px #000; white-space: nowrap; }
+		.bank-card-caption { display: flex; justify-content: space-between; gap: 8px; margin-top: 9px; color: #e6d7ae; font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+		.bank-card-caption span:last-child { color: #b7ad91; font-size: 8px; }
+		.bank-balances { display: grid; gap: 10px; margin-top: 20px; }
+		.bank-balance-card { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px; border: 1px solid #35332d; border-radius: 12px; background: #12110f; }
+		.bank-balance-label { color: #aaa79d; font-size: 12px; }
+		.bank-balance-value { color: #ffda56; font-size: 17px; font-weight: 800; font-variant-numeric: tabular-nums; text-align: right; }
+		.bank-ton-status { margin: 9px 0 0; color: #89877f; font-size: 10px; line-height: 1.5; text-align: right; }
+		.bank-actions { display: flex; gap: 8px; margin-top: 12px; }
+		.bank-actions .action-button { flex: 1; min-height: 42px; padding: 0 10px; font-size: 11px; }
+		.bank-actions .action-button.secondary { border: 1px solid #48453b; background: #1b1a16; color: #ddd7c8; }
+		.bank-transfer-status { min-height: 16px; margin: 8px 0 0; color: #c6b36f; font-size: 10px; line-height: 1.5; text-align: center; }
+		.bank-disclaimer { margin: 10px 0 0; color: #89877f; font-size: 10px; line-height: 1.5; }
+		.bank-token-card { border-color: #665523; background: linear-gradient(145deg, #211d10, #12110f); }
+		.bank-token-card .bank-balance-value { color: #c8e78e; }
+		.exchange-panel, .bank-transfer-form { margin-top: 12px; padding: 14px; border: 1px solid #35332d; border-radius: 12px; background: #12110f; }
+		.exchange-title, .bank-transfer-title { margin: 0; color: #f5f2e9; font-size: 13px; font-weight: 800; }
+		.exchange-copy, .bank-transfer-copy { margin: 6px 0 0; color: #89877f; font-size: 10px; line-height: 1.5; }
+		.exchange-panel .action-button, .bank-transfer-form .action-button { width: 100%; margin-top: 11px; }
+		.bank-transfer-form label { display: block; margin-top: 12px; color: #aaa79d; font-size: 10px; font-weight: 700; }
+		.bank-transfer-form input { width: 100%; min-height: 42px; margin-top: 6px; padding: 0 11px; border: 1px solid #35332d; border-radius: 9px; background: #0c0c0b; color: #f5f2e9; font: inherit; font-size: 13px; }
 		.scene-empty { margin: 0; color: #a7a399; font-size: 13px; }
 		.profile-avatar { display: grid; width: 104px; aspect-ratio: 1; place-items: center; margin: 10px auto 22px; overflow: hidden; border: 2px solid #ffcb16; border-radius: 50%; background: #171611; }
 		.profile-avatar .avatar-fallback::before { top: 18px; width: 26px; height: 26px; }
@@ -123,6 +150,11 @@
 		.player-id-value { margin-top: 8px; color: var(--accent); font-size: 24px; font-weight: 800; letter-spacing: 2px; font-variant-numeric: tabular-nums; }
 		.profile-stats { display: flex; width: min(100%, 330px); justify-content: space-between; margin-top: 12px; padding: 17px 18px; border: 1px solid #302e27; border-radius: 12px; color: #aaa79d; font-size: 12px; }
 		.profile-stats strong { color: #fffdf6; font-variant-numeric: tabular-nums; }
+		.language-panel { width: min(100%, 330px); margin-top: 16px; text-align: left; }
+		.language-heading { margin: 0 0 9px; color: #aaa79d; font-size: 11px; font-weight: 700; }
+		.language-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+		.language-button { min-height: 42px; border: 1px solid #35332d; border-radius: 10px; background: #12110f; color: #aaa79d; cursor: pointer; font-size: 12px; font-weight: 700; }
+		.language-button[aria-pressed="true"] { border-color: #8d7428; background: #211d10; color: #ffda56; }
 		.wallet-panel { width: min(100%, 330px); margin-top: 12px; padding: 16px; border: 1px solid #35332d; border-radius: 12px; background: #12110f; text-align: left; }
 		.wallet-heading { margin: 0 0 10px; color: #f5f2e9; font-size: 13px; font-weight: 700; }
 		.wallet-status { margin: 0; color: #aaa79d; font-size: 11px; line-height: 1.5; }
@@ -141,10 +173,32 @@
 		.gift-copy { margin: -10px 0 0; color: #aaa79d; font-size: 12px; }
 		.action-button { min-height: 48px; padding: 0 22px; border: 0; border-radius: 12px; background: var(--accent); color: #17140a; font-size: 13px; font-weight: 800; cursor: pointer; }
 		.action-button:disabled { border: 1px solid #48453b; background: #24231f; color: #88857b; cursor: default; }
-		.referral-link { display: flex; gap: 8px; margin-top: 16px; }
-		.referral-link input { min-width: 0; flex: 1; padding: 0 11px; border: 1px solid #35332d; border-radius: 10px; background: #0c0c0b; color: #e8e4d8; font: inherit; font-size: 11px; }
 		.copy-button { min-height: 44px; padding: 0 14px; border: 1px solid #665523; border-radius: 10px; background: #211d10; color: #ffda56; font-size: 12px; font-weight: 700; cursor: pointer; }
 		.copy-status { min-height: 16px; margin: 8px 0 0; color: #c6b36f; font-size: 11px; }
+		.farm-scene { padding: 8px 0 16px; }
+		.farm-screen { position: relative; display: grid; min-height: 205px; place-items: center; margin: 20px 0 16px; overflow: hidden; border: 3px solid #628451; border-radius: 8px; background: repeating-linear-gradient(0deg, #151d16 0 3px, #19231b 3px 6px); box-shadow: inset 0 0 32px #000b, 0 0 0 4px #20251c, 0 0 22px #83b36530; }
+		.farm-screen::before { position: absolute; inset: 9px; border: 1px solid #8eaa6b55; content: ""; pointer-events: none; }
+		.farm-art { width: min(74%, 250px); height: 142px; image-rendering: pixelated; filter: drop-shadow(0 0 10px #94d56b55); }
+		.farm-status { margin: 0; color: #c8dba4; font-family: "Courier New", monospace; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-align: center; text-transform: uppercase; }
+		.farm-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+		.farm-stat { padding: 12px 10px; border: 1px solid #384331; border-radius: 8px; background: #111711; text-align: center; }
+		.farm-stat-label { color: #8d9b7d; font-family: "Courier New", monospace; font-size: 9px; letter-spacing: .7px; text-transform: uppercase; }
+		.farm-stat-value { margin-top: 6px; color: #c8e78e; font-family: "Courier New", monospace; font-size: 16px; font-weight: 700; }
+		.farm-scene .action-button { width: 100%; margin-top: 14px; border: 2px solid #ffe879; border-radius: 6px; background: #b68721; box-shadow: 0 4px 0 #594516; font-family: "Courier New", monospace; letter-spacing: .3px; }
+		.farm-scene .action-button:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 1px 0 #594516; }
+		.farm-scene .action-button:disabled { border-color: #48453b; box-shadow: none; }
+		.farm-note { margin: 13px 0 0; color: #89877f; font-size: 10px; line-height: 1.5; text-align: center; }
+		.referral-id, .referral-code-card { margin-top: 16px; padding: 15px; border: 1px solid #35332d; border-radius: 12px; background: #12110f; }
+		.referral-id { color: #aaa79d; font-size: 12px; }
+		.referral-id strong { margin-left: 6px; color: var(--accent); letter-spacing: 1.5px; }
+		.referral-code-label { color: #aaa79d; font-size: 10px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; }
+		.referral-code-row { display: flex; gap: 8px; margin-top: 8px; }
+		.referral-code-row input, .referral-entry input { min-width: 0; width: 100%; padding: 0 11px; border: 1px solid #35332d; border-radius: 10px; background: #0c0c0b; color: #ffda56; font: inherit; font-size: 14px; font-weight: 700; letter-spacing: 1px; }
+		.referral-entry { margin-top: 16px; }
+		.referral-entry label { display: block; margin-bottom: 8px; color: #aaa79d; font-size: 11px; font-weight: 700; }
+		.referral-entry input { min-height: 46px; }
+		.referral-entry .action-button { width: 100%; margin-top: 9px; }
+		.referral-note { margin: 10px 0 0; color: #89877f; font-size: 10px; line-height: 1.5; }
 
 		@keyframes rise { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
 		@keyframes pulse { 0%, 100% { transform: scale(.97); opacity: .4; } 50% { transform: scale(1.04); opacity: .9; } }
@@ -156,7 +210,7 @@
 			.play-area { min-height: 180px; }
 			.coin-button { width: min(56vh, 240px); }
 			.footer { padding-bottom: 8px; }
-			.nav-button { height: 74px; }
+			.nav-button { height: 68px; }
 			.nav-button img, .nav-glyph { width: 49px; height: 49px; }
 		}
 		@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; } }
@@ -164,12 +218,17 @@
 </head>
 <body>
 	<main class="app">
+		<div class="cloud-notice" id="cloudNotice" role="status" hidden></div>
 		<button class="profile-trigger" id="profileTrigger" type="button" aria-label="Открыть профиль">
 			<span class="avatar-fallback" id="avatarFallback" aria-hidden="true"></span>
 			<img id="avatarImage" alt="Аватар Telegram" style="display: none">
 		</button>
 
 		<section class="scene is-active" id="homeScene" data-scene="home" aria-label="Главная">
+			<div class="player-badge" aria-label="Уровень игрока">
+				<div class="player-nickname" id="playerNickname">Игрок</div>
+				<div class="player-level" id="playerLevel">Новичок</div>
+			</div>
 			<header class="header">
 				<div class="brand"><span class="brand-mark" aria-hidden="true"></span>ЖКХ Коин</div>
 				<div class="total" id="total" aria-live="polite">0</div>
@@ -193,22 +252,76 @@
 
 		<section class="scene promo-scene" id="referralsScene" data-scene="referrals" aria-label="Рефералы">
 			<h1 class="promo-title">Рефералы</h1>
-			<p class="promo-description">Приглашайте друзей по своей ссылке.<br>За каждые 10 их тапов начисляется 0,001 коина.</p>
+			<p class="promo-description">Поделись постоянным кодом приглашения или введи код друга.</p>
 			<div class="promo-balance">Баланс <strong class="coins-balance">0</strong> коинов</div>
-			<div class="referral-link">
-				<input id="referralUrl" type="text" readonly aria-label="Ваша реферальная ссылка">
-				<button class="copy-button" id="copyReferral" type="button">Копировать</button>
+			<div class="referral-id">ID профиля<strong id="referralPlayerId">ABC0000000</strong></div>
+			<div class="referral-code-card">
+				<div class="referral-code-label">Ваш постоянный код</div>
+				<div class="referral-code-row">
+					<input id="referralCode" type="text" readonly aria-label="Ваш постоянный код приглашения">
+					<button class="copy-button" id="copyReferralCode" type="button">Копировать</button>
+				</div>
+				<p class="copy-status" id="copyStatus" aria-live="polite"></p>
 			</div>
-			<p class="copy-status" id="copyStatus" aria-live="polite"></p>
+			<form class="referral-entry" id="referralForm">
+				<label for="referralInput">Код приглашения друга</label>
+				<input id="referralInput" type="text" maxlength="11" pattern="[A-Za-z0-9]{11}" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Например, We5746QwtrW" aria-label="Введите код приглашения">
+				<button class="action-button" id="redeemReferral" type="submit">Запросить код</button>
+				<p class="copy-status" id="referralStatus" aria-live="polite"></p>
+				<p class="referral-note">Код можно применить только один раз. В локальной версии коды работают только в этом браузере и не синхронизируются между игроками.</p>
+			</form>
 		</section>
 
-		<section class="scene" id="bankScene" data-scene="bank" aria-label="Международный некоммерческий банк">
+		<section class="scene" id="bankScene" data-scene="bank" aria-label="Внутренний банк ЖКХ Коин">
 			<h1 class="scene-heading">Международный банк</h1>
-			<p class="scene-subtitle">Некоммерческий банк для международных инициатив</p>
-			<div class="bank-poster">
-				<img src="photo_2026-10-28_18-50-34.jpg" alt="Плакат ЖКХ Коин: вместе строим будущее">
-				<p class="bank-caption">Работаем не покладая рук<span>Working tirelessly</span></p>
+			<p class="scene-subtitle">Внутренний банк ЖКХ Коин</p>
+			<div class="bank-card" aria-label="Виртуальная карта ЖКХ Коин">
+				<img class="bank-card-art" src="photo_2026-11-10_14-05-57.jpg" alt="">
+				<div class="bank-card-shade" aria-hidden="true"></div>
+				<div class="bank-card-badge">ВИРТУАЛЬНАЯ</div>
+				<div class="bank-card-details">
+					<div class="bank-card-number" id="bankCardNumber">8888 0000 0000</div>
+					<div class="bank-card-caption"><span>Карта ЖКХ Коин</span><span>ЖКХ БАНК</span></div>
+				</div>
 			</div>
+			<div class="bank-balances">
+				<div class="bank-balance-card">
+					<span class="bank-balance-label">Баланс ЖКХ-коинов</span>
+					<strong class="bank-balance-value" id="bankCoinBalance">0</strong>
+				</div>
+				<div class="bank-balance-card bank-token-card">
+					<span class="bank-balance-label">Кошелёк ЖКХ-токенов</span>
+					<strong class="bank-balance-value" id="bankTokenBalance">0</strong>
+				</div>
+				<div class="bank-balance-card">
+					<div>
+						<div class="bank-balance-label">Баланс TON</div>
+						<p class="bank-ton-status" id="bankTonStatus" aria-live="polite">Кошелёк не подключён</p>
+					</div>
+					<strong class="bank-balance-value" id="bankTonBalance">— TON</strong>
+				</div>
+			</div>
+			<div class="bank-actions">
+				<button class="action-button secondary" id="bankConnectWallet" type="button">Открыть профиль / TON</button>
+				<button class="action-button secondary" id="refreshTonBalance" type="button" hidden>Обновить TON</button>
+			</div>
+			<section class="exchange-panel" aria-label="Обмен токенов на коины">
+				<h2 class="exchange-title">Обменник</h2>
+				<p class="exchange-copy">100 ЖКХ-токенов → 1000 тап-коинов. Токены спишутся из кошелька банка, коины поступят на игровой баланс.</p>
+				<button class="action-button" id="exchangeTokens" type="button">Обменять 100 токенов</button>
+				<p class="bank-transfer-status" id="exchangeStatus" aria-live="polite"></p>
+			</section>
+			<form class="bank-transfer-form" id="bankTransferForm">
+				<h2 class="bank-transfer-title">Перевод ЖКХ-токенов</h2>
+				<p class="bank-transfer-copy">Перевод между банковскими картами игроков.</p>
+				<label for="transferCardNumber">Номер карты получателя</label>
+				<input id="transferCardNumber" type="text" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="8888 0000 0000" required>
+				<label for="transferTokenAmount">Количество токенов</label>
+				<input id="transferTokenAmount" type="number" min="1" step="1" inputmode="numeric" placeholder="Например, 100" required>
+				<button class="action-button" id="sendTokenTransfer" type="submit">Перевести токены</button>
+				<p class="bank-transfer-status" id="bankTransferStatus" aria-live="polite"></p>
+				<p class="bank-disclaimer">Переводы доступны картам, выпущенным в этом браузере.</p>
+			</form>
 		</section>
 
 		<section class="scene promo-scene" id="giftsScene" data-scene="gifts" aria-label="Ежедневный подарок">
@@ -221,6 +334,30 @@
 				<p class="gift-copy" id="giftStatus">Коины доступны один раз в день</p>
 				<button class="action-button" id="claimGift" type="button">Забрать 10 коинов</button>
 			</div>
+		</section>
+
+		<section class="scene farm-scene" id="farmScene" data-scene="farm" aria-label="Майнинговая ферма">
+			<h1 class="promo-title">Майнинг-ферма</h1>
+			<p class="promo-description">Поставь ретро-ферму добывать ЖКХ-токены, пока ты занят.</p>
+			<div class="farm-screen" aria-hidden="true">
+				<svg class="farm-art" viewBox="0 0 160 100" shape-rendering="crispEdges">
+					<path d="M22 18h116v64H22z" fill="#263a29" stroke="#a4c478" stroke-width="4"/>
+					<path d="M32 28h96v44H32z" fill="#111a13" stroke="#668950" stroke-width="3"/>
+					<path d="M48 38h16v16H48zM72 38h16v16H72zM96 38h16v16H96z" fill="#c6e783"/>
+					<path d="M48 58h64v5H48zM60 82h40v8H60z" fill="#a4c478"/>
+					<path d="M16 90h128v6H16z" fill="#668950"/>
+					<path d="M38 10h8v8h-8zM114 10h8v8h-8zM38 82h8v8h-8zM114 82h8v8h-8z" fill="#e1bd50"/>
+					<path d="M68 43h8v5h-8zM91 43h8v5h-8z" fill="#3c6543"/>
+				</svg>
+			</div>
+			<p class="farm-status" id="farmStatus" aria-live="polite">ФЕРМА НЕ ПОСТРОЕНА</p>
+			<div class="farm-stats">
+				<div class="farm-stat"><div class="farm-stat-label">Добыча</div><div class="farm-stat-value">100 ток./день</div></div>
+				<div class="farm-stat"><div class="farm-stat-label">Цикл</div><div class="farm-stat-value" id="farmEarned">0 / 300</div></div>
+				<div class="farm-stat"><div class="farm-stat-label">Цена</div><div class="farm-stat-value" id="farmPrice">1000</div></div>
+			</div>
+			<button class="action-button" id="buyFarm" type="button">Построить ферму · 1000 тап-коинов</button>
+			<p class="farm-note" id="farmNote">Ферма работает 3 дня. Каждые 100 добытых токенов автоматически поступают в банковский кошелёк.</p>
 		</section>
 
 		<section class="scene profile-scene" id="profileScene" data-scene="profile" aria-label="Профиль игрока">
@@ -236,6 +373,13 @@
 			</div>
 			<div class="profile-stats"><span>Всего кликов</span><strong id="profileTotal">0</strong></div>
 			<div class="profile-stats"><span>Баланс коинов</span><strong class="coins-balance">0</strong></div>
+			<section class="language-panel" aria-label="Язык">
+				<h2 class="language-heading">Язык / Language</h2>
+				<div class="language-options">
+					<button class="language-button" type="button" data-language="ru">Русский</button>
+					<button class="language-button" type="button" data-language="en">English</button>
+				</div>
+			</section>
 			<section class="wallet-panel" aria-label="TON-кошелёк">
 				<h2 class="wallet-heading">TON-кошелёк</h2>
 				<p class="wallet-status" id="walletStatus" aria-live="polite">Проверяем возможность подключения…</p>
@@ -258,16 +402,34 @@
 			<button class="nav-button" type="button" data-target="gifts" aria-label="Ежедневный подарок">
 				<svg class="nav-icon" viewBox="0 0 40 40" aria-hidden="true"><path d="M7 18h26v17H7zM5 12h30v7H5zM20 12v23"/><path d="M20 12h-7a4 4 0 1 1 4-4c0 2.2 3 4 3 4ZM20 12h7a4 4 0 1 0-4-4c0 2.2-3 4-3 4Z"/></svg><span class="nav-label">Подарок</span>
 			</button>
+			<button class="nav-button" type="button" data-target="farm" aria-label="Майнинг-ферма">
+				<svg class="nav-icon" viewBox="0 0 40 40" aria-hidden="true">
+					<path d="m13 30 12-15" stroke-width="3"/>
+					<path d="M10 13c4-5 11-7 17-4l6 4c-5 2-10 2-14 0l-4 5"/>
+					<path d="m23 24 4-3 2 3 4-1 2 5-4 5h-9l-3-4z"/>
+					<path d="m24 25-2 4 4 1m1-8 2 3m-2-10 2 2m4-8 1-3m-1 7 4-1"/>
+				</svg><span class="nav-label">Ферма</span>
+			</button>
 		</nav>
 	</main>
 
 	<script src="https://telegram.org/js/telegram-web-app.js"></script>
 	<script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
 	<script>
-		(() => {
+		(async () => {
 			const CAPACITY = 1000;
 			const RECHARGE_MS = 3600;
+			const FARM_COST = 1000;
+			const FARM_DAILY_INCOME = 100;
+			const DAY_MS = 24 * 60 * 60 * 1000;
+			const FARM_DURATION_MS = DAY_MS * 3;
+			const FARM_PRICE_STEP = 500;
+			const FARM_TOKEN_BATCH = 100;
+			const BANK_DATA_KEY = "zhkh-bank-data-v1";
+			const LOCAL_TEST_UNLIMITED_COINS = window.location.protocol === "file:"
+				|| ["localhost", "127.0.0.1"].includes(window.location.hostname);
 			const STORAGE_KEY = "zhkh-clicker-state-v1";
+			const REFERRAL_STORAGE_KEY = "zhkh-referral-data-v1";
 			const totalElement = document.querySelector("#total");
 			const energyCount = document.querySelector("#energyCount");
 			const energyFill = document.querySelector("#energyFill");
@@ -276,15 +438,370 @@
 			const coinButton = document.querySelector("#coinButton");
 			const playArea = document.querySelector("#playArea");
 			const profileTotal = document.querySelector("#profileTotal");
+			const playerLevel = document.querySelector("#playerLevel");
 			const claimGiftButton = document.querySelector("#claimGift");
+			const buyFarmButton = document.querySelector("#buyFarm");
+			const farmStatus = document.querySelector("#farmStatus");
+			const farmEarned = document.querySelector("#farmEarned");
+			const farmPrice = document.querySelector("#farmPrice");
 			const giftStatus = document.querySelector("#giftStatus");
 			const walletStatus = document.querySelector("#walletStatus");
 			const walletAddress = document.querySelector("#walletAddress");
 			const walletDisconnect = document.querySelector("#walletDisconnect");
+			const bankCoinBalance = document.querySelector("#bankCoinBalance");
+			const bankTokenBalance = document.querySelector("#bankTokenBalance");
+			const bankTonBalance = document.querySelector("#bankTonBalance");
+			const bankTonStatus = document.querySelector("#bankTonStatus");
+			const refreshTonBalanceButton = document.querySelector("#refreshTonBalance");
+			const bankCardNumberElement = document.querySelector("#bankCardNumber");
+			const bankTransferStatus = document.querySelector("#bankTransferStatus");
+			const exchangeStatus = document.querySelector("#exchangeStatus");
 			const telegramApp = window.Telegram?.WebApp;
 			const telegramUser = telegramApp?.initDataUnsafe?.user;
 			const scenes = [...document.querySelectorAll(".scene")];
 			const navButtons = [...document.querySelectorAll(".nav-button")];
+			const cloudMode = window.JKH_CLOUD_MODE === true;
+			const cloudNotice = document.querySelector("#cloudNotice");
+			const cloudApiBase = window.JKH_API_BASE || "";
+			let cloudProfile = null;
+			let cloudActionQueue = Promise.resolve();
+			let state = null;
+			let connectedTonAddress = "";
+			let connectedTonChain = "";
+			let tonConnectInstance = null;
+			let tonBalanceRequestId = 0;
+			let bankData = { cards: {}, wallets: {}, farms: {} };
+			let bankCardNumber = "";
+			let bankProfile = null;
+			const LANGUAGE_KEY = "zhkh-language-v1";
+			const translations = {
+				"Открыть профиль": "Open profile",
+				"Главная": "Home",
+				"Уровень игрока": "Player level",
+				"Всего кликов": "Total taps",
+				"Игровая кнопка": "Tap area",
+				"Нажать на монету": "Tap the coin",
+				"Жёлтая монета ЖКХ": "Yellow ЖКХ coin",
+				"Запас кликов": "Tap energy",
+				"Энергия": "Energy",
+				"Остаток кликов": "Taps remaining",
+				"Полное восстановление за 1 час": "Fully recharges in 1 hour",
+				"Рефералы": "Referrals",
+				"Поделись постоянным кодом приглашения или введи код друга.": "Share your permanent invite code or enter a friend's code.",
+				"Баланс": "Balance",
+				"коинов": "coins",
+				"ID профиля": "Profile ID",
+				"Ваш постоянный код": "Your permanent code",
+				"Копировать": "Copy",
+				"Код приглашения друга": "Friend's invite code",
+				"Например, We5746QwtrW": "For example, We5746QwtrW",
+				"Введите код приглашения": "Enter an invite code",
+				"Запросить код": "Redeem code",
+				"Код можно применить только один раз. В локальной версии коды работают только в этом браузере и не синхронизируются между игроками.": "A code can only be used once. In the local version, codes work only in this browser and are not synced between players.",
+				"Внутренний банк ЖКХ Коин": "ЖКХ Coin internal bank",
+				"Международный банк": "International Bank",
+				"Международный некоммерческий банк": "International Nonprofit Bank",
+				"Виртуальная карта ЖКХ Коин": "ЖКХ Coin virtual card",
+				"ВИРТУАЛЬНАЯ": "VIRTUAL",
+				"Карта ЖКХ Коин": "ЖКХ Coin Card",
+				"ЖКХ БАНК": "ЖКХ BANK",
+				"Баланс ЖКХ-коинов": "ЖКХ coin balance",
+				"Кошелёк ЖКХ-токенов": "ЖКХ token wallet",
+				"Баланс TON": "TON balance",
+				"Кошелёк не подключён": "Wallet not connected",
+				"Открыть профиль / TON": "Open profile / TON",
+				"Обновить TON": "Refresh TON",
+				"Обмен токенов на коины": "Exchange tokens for coins",
+				"Обменник": "Exchange",
+				"100 ЖКХ-токенов → 1000 тап-коинов. Токены спишутся из кошелька банка, коины поступят на игровой баланс.": "100 ЖКХ tokens → 1,000 tap coins. Tokens are deducted from your bank wallet and coins are added to your game balance.",
+				"Обменять 100 токенов": "Exchange 100 tokens",
+				"Перевод ЖКХ-токенов": "ЖКХ token transfer",
+				"Перевод между банковскими картами игроков.": "Transfer tokens between players' bank cards.",
+				"Номер карты получателя": "Recipient card number",
+				"Количество токенов": "Token amount",
+				"Перевести токены": "Transfer tokens",
+				"Переводы доступны картам, выпущенным в этом браузере.": "Transfers are available only to cards issued in this browser.",
+				"Ежедневный подарок": "Daily reward",
+				"Заходи каждый день за коинами": "Come back every day to collect coins",
+				"Иконка ежедневного подарка": "Daily reward icon",
+				"Коины доступны один раз в день": "Coins are available once a day",
+				"Забрать 10 коинов": "Claim 10 coins",
+				"Майнинг-ферма": "Mining farm",
+				"Поставь ретро-ферму добывать ЖКХ-токены, пока ты занят.": "Let the retro farm mine ЖКХ tokens while you're away.",
+				"ФЕРМА НЕ ПОСТРОЕНА": "FARM NOT BUILT",
+				"Добыча": "Production",
+				"100 ток./день": "100 tokens/day",
+				"Цикл": "Cycle",
+				"Цена": "Price",
+				"Ферма работает 3 дня. Каждые 100 добытых токенов автоматически поступают в банковский кошелёк.": "The farm runs for 3 days. Every 100 tokens mined are automatically deposited into your bank wallet.",
+				"Профиль игрока": "Player profile",
+				"Аватар Telegram": "Telegram avatar",
+				"ID игрока": "Player ID",
+				"Баланс коинов": "Coin balance",
+				"Язык": "Language",
+				"Язык / Language": "Language",
+				"Русский": "Russian",
+				"Игрок": "Player",
+				"Локальный профиль": "Local profile",
+				"Профиль Telegram": "Telegram profile",
+				"TON-кошелёк": "TON wallet",
+				"Проверяем возможность подключения…": "Checking wallet connection…",
+				"Отключить кошелёк": "Disconnect wallet",
+				"Разделы": "Sections",
+				"Банк": "Bank",
+				"Подарок": "Reward",
+				"Ферма": "Farm",
+				"Новичок": "Beginner",
+				"Инвестор": "Investor",
+				"Партнёр": "Partner",
+				"Вице-президент": "Vice President",
+				"CEO": "CEO",
+				"Для подключения кошелька опубликуйте приложение на HTTPS-сайте.": "Publish the app on an HTTPS website to connect a wallet.",
+				"Не удалось загрузить TON Connect. Проверьте подключение к интернету.": "Could not load TON Connect. Check your internet connection.",
+				"Кошелёк подключён": "Wallet connected",
+				"Подключение станет доступно после публикации HTTPS-сайта и настройки tonconnect-manifest.json.": "Wallet connection will be available after publishing the app over HTTPS and configuring tonconnect-manifest.json.",
+				"Кошелёк сохранён в профиле. Подключись к нему на этом устройстве.": "Wallet saved to your profile. Connect it on this device.",
+				"Получаем баланс подключённого кошелька": "Loading connected wallet balance",
+				"Загрузка…": "Loading…",
+				"Не удалось получить баланс. Попробуй обновить.": "Could not load the balance. Try refreshing.",
+				"Недоступен": "Unavailable",
+				"— TON": "— TON",
+				"Уже получено сегодня": "Already claimed today",
+				"Возвращайся завтра за новым подарком": "Come back tomorrow for another reward",
+				"Коины доступны один раз в день": "Coins are available once a day",
+				"ФЕРМА ДОБЫВАЕТ ЖКХ-ТОКЕНЫ": "FARM IS MINING ЖКХ TOKENS",
+				"ЦИКЛ ЗАВЕРШЁН · ТОКЕНЫ ЗАЧИСЛЕНЫ": "CYCLE COMPLETE · TOKENS DEPOSITED",
+				"Не удалось сохранить токены. Освободи место в браузере и перезагрузи страницу.": "Could not save tokens. Free up browser storage and reload the page.",
+				"Не удалось сохранить покупку фермы. Попробуй освободить место в браузере.": "Could not save the farm purchase. Try freeing up browser storage.",
+				"Не удалось сохранить банковский профиль в этом браузере.": "Could not save the bank profile in this browser.",
+				"Для обмена нужно 100 ЖКХ-токенов.": "You need 100 ЖКХ tokens to exchange.",
+				"Не удалось выполнить обмен: попробуй ещё раз.": "Exchange failed. Please try again.",
+				"Обмен выполнен: 1000 тап-коинов зачислены на баланс.": "Exchange complete: 1,000 tap coins added to your balance.",
+				"Введи полный номер карты из 12 цифр.": "Enter the full 12-digit card number.",
+				"Укажи целое количество токенов больше нуля.": "Enter a whole number of tokens greater than zero.",
+				"Карта не найдена среди карт, выпущенных в этом браузере.": "Card not found among cards issued in this browser.",
+				"Нельзя перевести токены самому себе.": "You can't transfer tokens to yourself.",
+				"Недостаточно ЖКХ-токенов в кошельке.": "Insufficient ЖКХ tokens in your wallet.",
+				"Не удалось выполнить перевод: попробуй ещё раз.": "Transfer failed. Please try again.",
+				"Не удалось сохранить код в этом браузере.": "Could not save the code in this browser.",
+				"Вы уже использовали код приглашения.": "You have already used an invite code.",
+				"Код пока недоступен.": "The code is not available yet.",
+				"Не удалось скопировать код. Выдели его и скопируй вручную.": "Could not copy the code. Select and copy it manually.",
+				"Код скопирован": "Code copied",
+				"Введи код из 11 латинских букв и цифр.": "Enter a code with 11 Latin letters and digits.",
+				"Ты уже использовал код приглашения.": "You've already used an invite code.",
+				"Код не найден. В локальной версии доступны только коды из этого браузера.": "Code not found. In the local version, only codes from this browser are available.",
+				"Нельзя использовать собственный код.": "You can't use your own code.",
+				"Этот код уже использован.": "This code has already been used.",
+				"Не удалось сохранить результат. Попробуй ещё раз.": "Could not save the result. Please try again.",
+				"Код успешно применён!": "Code redeemed successfully!",
+				"Открой игру через Telegram-бота, чтобы загрузить профиль.": "Open the game from its Telegram bot to load your profile.",
+				"Не удалось связаться с сервером.": "Could not reach the server.",
+				"Open the game from its Telegram bot.": "Open the game from its Telegram bot.",
+				"Invalid Telegram session data.": "Invalid Telegram session data.",
+				"Telegram session has expired. Reopen the game.": "Telegram session expired. Reopen the game.",
+				"Invalid Telegram session signature.": "Invalid Telegram session signature.",
+				"Telegram user ID is missing.": "Telegram user ID is missing.",
+				"Invalid Telegram user ID.": "Invalid Telegram user ID.",
+				"No energy remaining.": "No energy remaining.",
+				"Daily reward already claimed.": "Daily reward already claimed.",
+				"The farm cycle is still running.": "The farm cycle is still running.",
+				"Not enough coins.": "Not enough coins.",
+				"Not enough tokens.": "Not enough tokens.",
+				"Enter a valid 12-digit card number.": "Enter a valid 12-digit card number.",
+				"Enter a positive whole number of tokens.": "Enter a positive whole number of tokens.",
+				"Card not found.": "Card not found.",
+				"Cannot transfer tokens to yourself.": "Cannot transfer tokens to yourself.",
+				"Insufficient token balance.": "Insufficient token balance.",
+				"Invalid invite code.": "Invalid invite code.",
+				"Invite code not found.": "Invite code not found.",
+				"Cannot redeem your own invite code.": "Cannot redeem your own invite code.",
+				"Invite code already redeemed.": "Invite code already redeemed.",
+				"Unsupported language.": "Unsupported language.",
+				"Invalid TON wallet address.": "Invalid TON wallet address.",
+				"Unsupported TON network.": "Unsupported TON network.",
+				"Награда получена!": "Reward claimed!",
+				"Ферма запущена.": "Farm started.",
+				"Перевод выполнен.": "Transfer complete."
+			};
+			const serverErrorsInRussian = {
+				"Open the game from its Telegram bot.": "Открой игру через Telegram-бота, чтобы загрузить профиль.",
+				"Invalid Telegram session data.": "Данные сессии Telegram некорректны.",
+				"Telegram session has expired. Reopen the game.": "Сессия Telegram истекла. Закрой и снова открой игру.",
+				"Invalid Telegram session signature.": "Не удалось подтвердить подпись сессии Telegram.",
+				"Telegram user ID is missing.": "Не найден ID пользователя Telegram.",
+				"Invalid Telegram user ID.": "Некорректный ID пользователя Telegram.",
+				"No energy remaining.": "Энергия закончилась.",
+				"Daily reward already claimed.": "Сегодняшняя награда уже получена.",
+				"The farm cycle is still running.": "Ферма ещё работает.",
+				"Not enough coins.": "Недостаточно коинов.",
+				"Not enough tokens.": "Недостаточно токенов.",
+				"Enter a valid 12-digit card number.": "Введи полный номер карты из 12 цифр.",
+				"Enter a positive whole number of tokens.": "Укажи целое количество токенов больше нуля.",
+				"Card not found.": "Карта не найдена среди игроков.",
+				"Cannot transfer tokens to yourself.": "Нельзя перевести токены самому себе.",
+				"Insufficient token balance.": "Недостаточно ЖКХ-токенов в кошельке.",
+				"Invalid invite code.": "Введи код из 11 латинских букв и цифр.",
+				"Invite code not found.": "Код не найден среди игроков.",
+				"Cannot redeem your own invite code.": "Нельзя использовать собственный код.",
+				"Invite code already redeemed.": "Ты уже использовал код приглашения.",
+				"Unsupported language.": "Этот язык не поддерживается.",
+				"Invalid TON wallet address.": "Некорректный адрес TON-кошелька.",
+				"Unsupported TON network.": "Эта сеть TON не поддерживается."
+			};
+			let language = localStorage.getItem(LANGUAGE_KEY) === "en" ? "en" : "ru";
+			const originalTextNodes = new WeakMap();
+			const originalAttributes = new WeakMap();
+
+			function translate(text) {
+				if (language === "ru") return serverErrorsInRussian[text] || text;
+				if (translations[text] !== undefined) return translations[text];
+				let match = text.match(/^Нужно ([\d\s,]+) тап-коинов$/);
+				if (match) return `Need ${match[1]} tap coins`;
+				match = text.match(/^Построить ферму · ([\d\s,]+) тап-коинов$/);
+				if (match) return `Build farm · ${match[1]} tap coins`;
+				match = text.match(/^Купить следующую · ([\d\s,]+) тап-коинов$/);
+				if (match) return `Buy next · ${match[1]} tap coins`;
+				match = text.match(/^Работает · ещё (\d+) дн\.?$/);
+				if (match) return `Running · ${match[1]} day${match[1] === "1" ? "" : "s"} left`;
+				match = text.match(/^\+1 клик через (.+)$/);
+				if (match) return `+1 tap in ${match[1]}`;
+				match = text.match(/^Переведено ([\d\s,]+) ЖКХ-токенов\.?$/);
+				if (match) return `${match[1]} ЖКХ tokens transferred.`;
+				match = text.match(/^Адрес: (.+)$/);
+				if (match) return `Address: ${match[1]}`;
+				match = text.match(/^Кошелёк (.+)$/);
+				if (match) return `Wallet ${match[1]}`;
+				return text;
+			}
+
+			function setLocalizedText(element, text) {
+				element.dataset.localizedText = text;
+				element.textContent = translate(text);
+			}
+
+			function applyLanguage() {
+				document.documentElement.lang = language;
+				const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+				while (walker.nextNode()) {
+					const node = walker.currentNode;
+					if (!originalTextNodes.has(node)) originalTextNodes.set(node, node.textContent);
+					const original = originalTextNodes.get(node) || "";
+					const leading = original.match(/^\s*/)?.[0] || "";
+					const trailing = original.match(/\s*$/)?.[0] || "";
+					const content = original.slice(leading.length, original.length - trailing.length);
+					if (!content) continue;
+					node.textContent = `${leading}${translate(content)}${trailing}`;
+				}
+				document.querySelectorAll("*").forEach(element => {
+					for (const attribute of ["aria-label", "placeholder", "alt"]) {
+						if (!element.hasAttribute(attribute)) continue;
+						let values = originalAttributes.get(element);
+						if (!values) {
+							values = {};
+							originalAttributes.set(element, values);
+						}
+						if (values[attribute] === undefined) values[attribute] = element.getAttribute(attribute);
+						element.setAttribute(attribute, translate(values[attribute]));
+					}
+				});
+				document.querySelectorAll("[data-localized-text]").forEach(element => {
+					element.textContent = translate(element.dataset.localizedText || "");
+				});
+				document.querySelectorAll(".language-button").forEach(button => {
+					button.setAttribute("aria-pressed", String(button.dataset.language === language));
+				});
+			}
+
+			function numberLocale() {
+				return language === "en" ? "en-US" : "ru-RU";
+			}
+
+			function showCloudNotice(message) {
+				setLocalizedText(cloudNotice, message);
+				cloudNotice.hidden = false;
+			}
+
+			async function cloudRequest(path, payload) {
+				const response = await fetch(`${cloudApiBase}/api/${path}`, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+						"X-Telegram-Init-Data": telegramApp?.initData || ""
+					},
+					body: JSON.stringify(payload)
+				});
+				const result = await response.json();
+				if (!response.ok) throw new Error(result.detail || "Не удалось связаться с сервером.");
+				return result;
+			}
+
+			function getLegacyCloudData() {
+				return {
+					playerId: localStorage.getItem("zhkh-player-id"),
+					game: localStorage.getItem(STORAGE_KEY),
+					bank: localStorage.getItem(BANK_DATA_KEY),
+					referrals: localStorage.getItem(REFERRAL_STORAGE_KEY),
+					giftDate: localStorage.getItem("zhkh-daily-gift-date"),
+					language: localStorage.getItem(LANGUAGE_KEY)
+				};
+			}
+
+			function cacheCloudProfile(profile) {
+				cloudProfile = profile.state;
+				localStorage.setItem("zhkh-player-id", profile.state.playerId);
+				localStorage.setItem(STORAGE_KEY, JSON.stringify(profile.state.game));
+				localStorage.setItem(BANK_DATA_KEY, JSON.stringify({
+					cards: { [profile.state.playerId]: profile.state.bank.cardNumber },
+					wallets: { [profile.state.playerId]: profile.state.bank.tokenBalance },
+					farms: { [profile.state.playerId]: profile.state.bank.farm }
+				}));
+				localStorage.setItem(REFERRAL_STORAGE_KEY, JSON.stringify({
+					codes: {
+						[profile.state.referral.code]: {
+							ownerId: profile.state.playerId,
+							usedBy: profile.state.referral.codeUsed ? "ZZZ0000000" : null
+						}
+					},
+					referrals: profile.state.referral.used
+						? {
+							[profile.state.playerId]: {
+								inviterId: "ZZZ0000000",
+								code: profile.state.referral.usedCode || profile.state.referral.code
+							}
+						}
+						: {}
+				}));
+				localStorage.setItem("zhkh-daily-gift-date", profile.state.giftDate || "");
+				localStorage.setItem(LANGUAGE_KEY, profile.state.language === "en" ? "en" : "ru");
+				language = profile.state.language === "en" ? "en" : "ru";
+				if (typeof state !== "undefined" && state) {
+					Object.assign(state, profile.state.game);
+					bankCardNumber = profile.state.bank.cardNumber;
+					bankProfile = {
+						cardNumber: profile.state.bank.cardNumber,
+						tokenBalance: profile.state.bank.tokenBalance,
+						farm: profile.state.bank.farm
+					};
+					bankData.cards[playerId] = bankProfile.cardNumber;
+					bankData.wallets[playerId] = bankProfile.tokenBalance;
+					bankData.farms[playerId] = bankProfile.farm;
+				}
+				applyLanguage();
+			}
+
+			function dispatchCloudAction(action, payload, statusElement, successText) {
+				cloudActionQueue = cloudActionQueue.then(async () => {
+					const result = await cloudRequest(`action/${action}`, payload);
+					cacheCloudProfile(result);
+					if (statusElement && successText) setLocalizedText(statusElement, successText);
+					render();
+				}).catch(error => {
+					if (statusElement) setLocalizedText(statusElement, error.message);
+					else showCloudNotice(error.message);
+				});
+				return cloudActionQueue;
+			}
 
 			function createPlayerId() {
 				const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -306,6 +823,138 @@
 				} catch { return createPlayerId(); }
 			}
 
+			function createReferralCode() {
+				const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+				const randomValues = new Uint32Array(11);
+				if (window.crypto?.getRandomValues) window.crypto.getRandomValues(randomValues);
+				else randomValues.forEach((_, index) => { randomValues[index] = Math.floor(Math.random() * 0xffffffff); });
+				return Array.from(randomValues, value => alphabet[value % alphabet.length]).join("");
+			}
+
+			function createBankCardNumber() {
+				const randomValues = new Uint32Array(8);
+				if (window.crypto?.getRandomValues) window.crypto.getRandomValues(randomValues);
+				else randomValues.forEach((_, index) => { randomValues[index] = Math.floor(Math.random() * 0xffffffff); });
+				return `8888${Array.from(randomValues, value => String(value % 10)).join("")}`;
+			}
+
+			function loadBankData() {
+				try {
+					const saved = JSON.parse(localStorage.getItem(BANK_DATA_KEY));
+					if (!saved || typeof saved !== "object" || Array.isArray(saved)) return { cards: {}, wallets: {}, farms: {} };
+					const cards = {};
+					const usedCardNumbers = new Set();
+					if (saved.cards && typeof saved.cards === "object" && !Array.isArray(saved.cards)) {
+						Object.entries(saved.cards).forEach(([ownerId, cardNumber]) => {
+							if (/^[A-Z]{3}\d{7}$/.test(ownerId) && /^8888\d{8}$/.test(cardNumber || "")
+								&& !usedCardNumbers.has(cardNumber)) {
+								cards[ownerId] = cardNumber;
+								usedCardNumbers.add(cardNumber);
+							}
+						});
+					}
+					const wallets = {};
+					if (saved.wallets && typeof saved.wallets === "object" && !Array.isArray(saved.wallets)) {
+						Object.entries(saved.wallets).forEach(([ownerId, amount]) => {
+							if (/^[A-Z]{3}\d{7}$/.test(ownerId) && Number.isFinite(amount) && amount >= 0) {
+								wallets[ownerId] = amount;
+							}
+						});
+					}
+					const farms = {};
+					if (saved.farms && typeof saved.farms === "object" && !Array.isArray(saved.farms)) {
+						Object.entries(saved.farms).forEach(([ownerId, farm]) => {
+							if (!/^[A-Z]{3}\d{7}$/.test(ownerId) || !farm || !Number.isSafeInteger(farm.purchases) || farm.purchases < 0) return;
+							const active = farm.active;
+							const validActive = active && Number.isFinite(active.startedAt) && active.startedAt <= Date.now()
+								&& Number.isInteger(active.creditedBatches) && active.creditedBatches >= 0 && active.creditedBatches <= 3
+								? { startedAt: active.startedAt, creditedBatches: active.creditedBatches }
+								: null;
+							farms[ownerId] = { purchases: farm.purchases, active: validActive };
+						});
+					}
+					return { cards, wallets, farms };
+				} catch {
+					return { cards: {}, wallets: {}, farms: {} };
+				}
+			}
+
+			function saveBankData() {
+				try {
+					localStorage.setItem(BANK_DATA_KEY, JSON.stringify(bankData));
+					return true;
+				} catch {
+					return false;
+				}
+			}
+
+			function getFarmPrice(profile) {
+				return FARM_COST + profile.farm.purchases * FARM_PRICE_STEP;
+			}
+
+			function syncFarm(now) {
+				const active = bankProfile?.farm.active;
+				if (!active) return 0;
+				const elapsed = Math.min(FARM_DURATION_MS, Math.max(0, now - active.startedAt));
+				const produced = Math.min(FARM_DAILY_INCOME * 3, elapsed * FARM_DAILY_INCOME / DAY_MS);
+				if (cloudMode) return produced;
+				const earnedBatches = Math.min(3, Math.floor((produced + 1e-8) / FARM_TOKEN_BATCH));
+				if (earnedBatches > active.creditedBatches) {
+					const previousBatches = active.creditedBatches;
+					const previousBalance = bankProfile.tokenBalance;
+					const previousStoredBalance = bankData.wallets[playerId] || 0;
+					bankProfile.tokenBalance += (earnedBatches - previousBatches) * FARM_TOKEN_BATCH;
+					bankData.wallets[playerId] = bankProfile.tokenBalance;
+					active.creditedBatches = earnedBatches;
+					if (!saveBankData()) {
+						bankProfile.tokenBalance = previousBalance;
+						bankData.wallets[playerId] = previousStoredBalance;
+						active.creditedBatches = previousBatches;
+						setLocalizedText(document.querySelector("#farmNote"), "Не удалось сохранить токены. Освободи место в браузере и перезагрузи страницу.");
+					}
+				}
+				return produced;
+			}
+
+			function loadReferralData() {
+				try {
+					const saved = JSON.parse(localStorage.getItem(REFERRAL_STORAGE_KEY));
+					if (!saved || typeof saved !== "object" || Array.isArray(saved)) {
+						return { codes: {}, referrals: {} };
+					}
+					const codes = {};
+					if (saved.codes && typeof saved.codes === "object" && !Array.isArray(saved.codes)) {
+						Object.entries(saved.codes).forEach(([code, record]) => {
+							if (/^[A-Za-z0-9]{11}$/.test(code) && record && /^[A-Z]{3}\d{7}$/.test(record.ownerId || "")
+								&& (record.usedBy === null || /^[A-Z]{3}\d{7}$/.test(record.usedBy || ""))) {
+								codes[code] = { ownerId: record.ownerId, usedBy: record.usedBy };
+							}
+						});
+					}
+					const referrals = {};
+					if (saved.referrals && typeof saved.referrals === "object" && !Array.isArray(saved.referrals)) {
+						Object.entries(saved.referrals).forEach(([profileId, record]) => {
+							if (/^[A-Z]{3}\d{7}$/.test(profileId) && record && /^[A-Z]{3}\d{7}$/.test(record.inviterId || "")
+								&& /^[A-Za-z0-9]{11}$/.test(record.code || "")) {
+								referrals[profileId] = { inviterId: record.inviterId, code: record.code };
+							}
+						});
+					}
+					return { codes, referrals };
+				} catch {
+					return { codes: {}, referrals: {} };
+				}
+			}
+
+			function saveReferralData(data) {
+				try {
+					localStorage.setItem(REFERRAL_STORAGE_KEY, JSON.stringify(data));
+					return true;
+				} catch {
+					return false;
+				}
+			}
+
 			function setAvatar(imageId, fallbackId) {
 				if (!telegramUser?.photo_url) return;
 				const image = document.querySelector(imageId);
@@ -316,11 +965,11 @@
 
 			async function setupTonConnect() {
 				if (window.location.protocol !== "https:") {
-					walletStatus.textContent = "Для подключения кошелька опубликуйте приложение на HTTPS-сайте.";
+					setLocalizedText(walletStatus, "Для подключения кошелька опубликуйте приложение на HTTPS-сайте.");
 					return;
 				}
 				if (!window.TON_CONNECT_UI?.TonConnectUI) {
-					walletStatus.textContent = "Не удалось загрузить TON Connect. Проверьте подключение к интернету.";
+					setLocalizedText(walletStatus, "Не удалось загрузить TON Connect. Проверьте подключение к интернету.");
 					return;
 				}
 
@@ -336,17 +985,61 @@
 						manifestUrl,
 						buttonRootId: "tonConnectButton"
 					});
-					tonConnectUI.uiOptions = { language: "ru", uiPreferences: { theme: "DARK" } };
+					tonConnectInstance = tonConnectUI;
+					tonConnectUI.uiOptions = { language, uiPreferences: { theme: "DARK" } };
 					tonConnectUI.onStatusChange(wallet => {
 						const address = wallet?.account?.address;
-						walletStatus.textContent = wallet ? "Кошелёк подключён" : "Кошелёк не подключён";
-						walletAddress.hidden = !address;
-						walletAddress.textContent = address ? `Адрес: ${address}` : "";
+						connectedTonAddress = address || "";
+						connectedTonChain = wallet?.account?.chain || "";
+						const savedWallet = cloudProfile?.wallet;
+						setLocalizedText(
+							walletStatus,
+							wallet ? "Кошелёк подключён" : savedWallet?.address
+								? "Кошелёк сохранён в профиле. Подключись к нему на этом устройстве."
+								: "Кошелёк не подключён"
+						);
+						const displayAddress = address || savedWallet?.address || "";
+						walletAddress.hidden = !displayAddress;
+						setLocalizedText(walletAddress, displayAddress ? `Адрес: ${displayAddress}` : "");
 						walletDisconnect.classList.toggle("is-visible", Boolean(wallet));
+						refreshTonBalanceButton.hidden = !address;
+						if (address) {
+							refreshTonBalance(address, connectedTonChain);
+							if (cloudMode) dispatchCloudAction("wallet", { address, chain: connectedTonChain });
+						}
+						else {
+							tonBalanceRequestId += 1;
+							setLocalizedText(bankTonBalance, "— TON");
+							setLocalizedText(bankTonStatus, "Кошелёк не подключён");
+						}
 					});
 					walletDisconnect.addEventListener("click", () => tonConnectUI.disconnect());
 				} catch {
-					walletStatus.textContent = "Подключение станет доступно после публикации HTTPS-сайта и настройки tonconnect-manifest.json.";
+					setLocalizedText(walletStatus, "Подключение станет доступно после публикации HTTPS-сайта и настройки tonconnect-manifest.json.");
+				}
+			}
+
+			async function refreshTonBalance(address, chain) {
+				const requestId = ++tonBalanceRequestId;
+				setLocalizedText(bankTonBalance, "Загрузка…");
+				setLocalizedText(bankTonStatus, "Получаем баланс подключённого кошелька");
+				const network = chain === "-3" ? "https://testnet.tonapi.io" : "https://tonapi.io";
+				try {
+					const response = await fetch(`${network}/v2/accounts/${encodeURIComponent(address)}`);
+					if (!response.ok) throw new Error("TON balance request failed");
+					const payload = await response.text();
+					const balanceMatch = payload.match(/"balance"\s*:\s*(\d+)/);
+					if (!balanceMatch) throw new Error("TON balance response is invalid");
+					if (requestId !== tonBalanceRequestId || address !== connectedTonAddress) return;
+					const nanotons = BigInt(balanceMatch[1]);
+					const whole = nanotons / 1_000_000_000n;
+					const fraction = String(nanotons % 1_000_000_000n).padStart(9, "0").slice(0, 4);
+					setLocalizedText(bankTonBalance, `${whole.toLocaleString(numberLocale())}${language === "en" ? "." : ","}${fraction} TON`);
+					setLocalizedText(bankTonStatus, `Кошелёк ${address.slice(0, 6)}…${address.slice(-5)}`);
+				} catch {
+					if (requestId !== tonBalanceRequestId || address !== connectedTonAddress) return;
+					setLocalizedText(bankTonBalance, "Недоступен");
+					setLocalizedText(bankTonStatus, "Не удалось получить баланс. Попробуй обновить.");
 				}
 			}
 
@@ -370,14 +1063,34 @@
 							energy: Math.max(0, Math.min(CAPACITY, Math.floor(saved.energy))),
 							total: Math.max(0, Math.floor(saved.total)),
 							coins: Number.isFinite(saved.coins) ? Math.max(0, saved.coins) : 0,
-							updatedAt: saved.updatedAt
+							updatedAt: saved.updatedAt,
+							farmPurchasedAt: Number.isFinite(saved.farmPurchasedAt) && saved.farmPurchasedAt <= Date.now()
+								? saved.farmPurchasedAt
+								: null,
+							farmLastAccruedAt: Number.isFinite(saved.farmLastAccruedAt) && saved.farmLastAccruedAt <= Date.now()
+								? saved.farmLastAccruedAt
+								: null
 						};
 					}
 				} catch { /* Start with a full reserve if saved data is unavailable. */ }
-				return { energy: CAPACITY, total: 0, coins: 0, updatedAt: Date.now() };
+				return { energy: CAPACITY, total: 0, coins: 0, updatedAt: Date.now(), farmPurchasedAt: null, farmLastAccruedAt: null };
 			}
 
-			let state = loadState();
+			if (cloudMode) {
+				if (!telegramApp?.initData) {
+					showCloudNotice("Открой игру через Telegram-бота, чтобы загрузить профиль.");
+					return;
+				}
+				try {
+					const profile = await cloudRequest("profile/bootstrap", { legacy: getLegacyCloudData() });
+					cacheCloudProfile(profile);
+				} catch (error) {
+					showCloudNotice(error.message);
+					return;
+				}
+			}
+
+			state = loadState();
 
 			function saveState() {
 				try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch { /* Keep this session usable if storage is blocked. */ }
@@ -403,22 +1116,65 @@
 			function render() {
 				const now = Date.now();
 				recharge(now);
-				totalElement.textContent = state.total.toLocaleString("ru-RU");
-				profileTotal.textContent = state.total.toLocaleString("ru-RU");
+				const farmProduced = syncFarm(now);
+				totalElement.textContent = state.total.toLocaleString(numberLocale());
+				profileTotal.textContent = state.total.toLocaleString(numberLocale());
+				setLocalizedText(playerLevel, state.total <= 5000
+					? "Новичок"
+					: state.total <= 15000
+						? "Инвестор"
+						: state.total <= 30000
+							? "Партнёр"
+							: state.total <= 100000
+								? "Вице-президент"
+								: "CEO");
 				document.querySelectorAll(".coins-balance").forEach(element => {
-					element.textContent = state.coins.toLocaleString("ru-RU", { minimumFractionDigits: 0, maximumFractionDigits: 3 });
+					element.textContent = LOCAL_TEST_UNLIMITED_COINS
+						? "∞"
+						: state.coins.toLocaleString(numberLocale(), { minimumFractionDigits: 0, maximumFractionDigits: 3 });
 				});
+				bankCoinBalance.textContent = LOCAL_TEST_UNLIMITED_COINS
+					? "∞"
+					: state.coins.toLocaleString(numberLocale(), { minimumFractionDigits: 0, maximumFractionDigits: 3 });
+				bankTokenBalance.textContent = (bankProfile?.tokenBalance || 0).toLocaleString(numberLocale(), {
+					minimumFractionDigits: 0,
+					maximumFractionDigits: 3
+				});
+				document.querySelector("#exchangeTokens").disabled = (bankProfile?.tokenBalance || 0) < FARM_TOKEN_BATCH;
 				energyCount.textContent = `${state.energy} / ${CAPACITY}`;
 				energyFill.style.width = `${(state.energy / CAPACITY) * 100}%`;
 				energyTrack.setAttribute("aria-valuenow", String(state.energy));
 				coinButton.disabled = state.energy === 0;
-				const giftClaimed = localStorage.getItem("zhkh-daily-gift-date") === getLocalDateKey(now);
+				const giftClaimed = cloudMode
+					? cloudProfile?.giftDate === new Date(now).toISOString().slice(0, 10)
+					: localStorage.getItem("zhkh-daily-gift-date") === getLocalDateKey(now);
 				claimGiftButton.disabled = giftClaimed;
-				claimGiftButton.textContent = giftClaimed ? "Уже получено сегодня" : "Забрать 10 коинов";
-				giftStatus.textContent = giftClaimed ? "Возвращайся завтра за новым подарком" : "Коины доступны один раз в день";
-				recovery.textContent = state.energy === CAPACITY
+				setLocalizedText(claimGiftButton, giftClaimed ? "Уже получено сегодня" : "Забрать 10 коинов");
+				setLocalizedText(giftStatus, giftClaimed ? "Возвращайся завтра за новым подарком" : "Коины доступны один раз в день");
+				const currentFarmPrice = bankProfile ? getFarmPrice(bankProfile) : FARM_COST;
+				farmPrice.textContent = currentFarmPrice.toLocaleString(numberLocale());
+				const activeFarm = bankProfile?.farm.active;
+				if (!activeFarm) {
+					setLocalizedText(farmStatus, "ФЕРМА НЕ ПОСТРОЕНА");
+					farmEarned.textContent = "0 / 300";
+					buyFarmButton.disabled = !bankProfile || (!LOCAL_TEST_UNLIMITED_COINS && state.coins < currentFarmPrice);
+					setLocalizedText(buyFarmButton, !LOCAL_TEST_UNLIMITED_COINS && state.coins < currentFarmPrice
+						? `Нужно ${currentFarmPrice.toLocaleString(numberLocale())} тап-коинов`
+						: `Построить ферму · ${currentFarmPrice.toLocaleString(numberLocale())} тап-коинов`);
+				} else {
+					const cycleFinished = now - activeFarm.startedAt >= FARM_DURATION_MS;
+					setLocalizedText(farmStatus, cycleFinished ? "ЦИКЛ ЗАВЕРШЁН · ТОКЕНЫ ЗАЧИСЛЕНЫ" : "ФЕРМА ДОБЫВАЕТ ЖКХ-ТОКЕНЫ");
+					farmEarned.textContent = `${farmProduced.toLocaleString(numberLocale(), { maximumFractionDigits: 3 })} / 300`;
+					buyFarmButton.disabled = !cycleFinished || (!LOCAL_TEST_UNLIMITED_COINS && state.coins < currentFarmPrice);
+					setLocalizedText(buyFarmButton, !cycleFinished
+						? `Работает · ещё ${Math.ceil((FARM_DURATION_MS - (now - activeFarm.startedAt)) / DAY_MS)} дн.`
+						: !LOCAL_TEST_UNLIMITED_COINS && state.coins < currentFarmPrice
+							? `Нужно ${currentFarmPrice.toLocaleString(numberLocale())} тап-коинов`
+							: `Купить следующую · ${currentFarmPrice.toLocaleString(numberLocale())} тап-коинов`);
+				}
+				setLocalizedText(recovery, state.energy === CAPACITY
 					? "Полное восстановление за 1 час"
-					: `+1 клик через ${formatTime(RECHARGE_MS - (now - state.updatedAt) % RECHARGE_MS)}`;
+					: `+1 клик через ${formatTime(RECHARGE_MS - (now - state.updatedAt) % RECHARGE_MS)}`);
 				saveState();
 			}
 
@@ -443,6 +1199,11 @@
 			}
 
 			coinButton.addEventListener("click", () => {
+				if (cloudMode) {
+					showTapEffect();
+					dispatchCloudAction("tap", {});
+					return;
+				}
 				recharge(Date.now());
 				if (state.energy <= 0) return;
 				state.energy -= 1;
@@ -452,6 +1213,10 @@
 			});
 
 			claimGiftButton.addEventListener("click", () => {
+				if (cloudMode) {
+					dispatchCloudAction("gift", {}, giftStatus, "Награда получена!");
+					return;
+				}
 				const today = getLocalDateKey(Date.now());
 				if (localStorage.getItem("zhkh-daily-gift-date") === today) return;
 				state.coins = Math.round((state.coins + 10) * 1000) / 1000;
@@ -460,34 +1225,280 @@
 				render();
 			});
 
+			buyFarmButton.addEventListener("click", () => {
+				if (cloudMode) {
+					dispatchCloudAction("farm", {}, farmStatus, "Ферма запущена.");
+					return;
+				}
+				const now = Date.now();
+				if (!bankProfile) return;
+				syncFarm(now);
+				if (bankProfile.farm.active && now - bankProfile.farm.active.startedAt < FARM_DURATION_MS) return;
+				const price = getFarmPrice(bankProfile);
+				if (!LOCAL_TEST_UNLIMITED_COINS && state.coins < price) return;
+
+				const previousCoins = state.coins;
+				const previousFarm = { ...bankProfile.farm };
+				if (!LOCAL_TEST_UNLIMITED_COINS) state.coins -= price;
+				bankProfile.farm = {
+					purchases: previousFarm.purchases + 1,
+					active: { startedAt: now, creditedBatches: 0 }
+				};
+				bankData.farms[playerId] = bankProfile.farm;
+				if (!saveBankData()) {
+					state.coins = previousCoins;
+					bankProfile.farm = previousFarm;
+					bankData.farms[playerId] = previousFarm;
+					setLocalizedText(document.querySelector("#farmNote"), "Не удалось сохранить покупку фермы. Попробуй освободить место в браузере.");
+					return;
+				}
+				saveState();
+				render();
+			});
+
+			document.querySelector("#bankConnectWallet").addEventListener("click", () => openScene("profile"));
+			refreshTonBalanceButton.addEventListener("click", () => {
+				if (connectedTonAddress) refreshTonBalance(connectedTonAddress, connectedTonChain);
+			});
+
+			bankData = loadBankData();
 			const playerId = getPlayerId();
+			try {
+				let ownerCardNumber = bankData.cards[playerId];
+				if (!ownerCardNumber) {
+					const oldCardNumber = localStorage.getItem("zhkh-bank-card-number-v1");
+					if (/^8888\d{8}$/.test(oldCardNumber || "") && !Object.values(bankData.cards).includes(oldCardNumber)) {
+						ownerCardNumber = oldCardNumber;
+					} else {
+						do { ownerCardNumber = createBankCardNumber(); }
+						while (Object.values(bankData.cards).includes(ownerCardNumber));
+					}
+					bankData.cards[playerId] = ownerCardNumber;
+				}
+				if (!Number.isFinite(bankData.wallets[playerId])) bankData.wallets[playerId] = 0;
+				if (!bankData.farms[playerId]) bankData.farms[playerId] = { purchases: 0, active: null };
+				bankProfile = {
+					cardNumber: ownerCardNumber,
+					tokenBalance: bankData.wallets[playerId],
+					farm: bankData.farms[playerId]
+				};
+				if (!saveBankData()) throw new Error("Unable to persist bank profile");
+				bankCardNumber = ownerCardNumber;
+			} catch {
+				setLocalizedText(bankTransferStatus, "Не удалось сохранить банковский профиль в этом браузере.");
+			}
+			bankCardNumberElement.textContent = bankCardNumber
+				? bankCardNumber.match(/.{1,4}/g).join(" ")
+				: "8888 •••• ••••";
+			document.querySelector("#exchangeTokens").addEventListener("click", () => {
+				if (cloudMode) {
+					dispatchCloudAction("exchange", {}, exchangeStatus, "Обмен выполнен: 1000 тап-коинов зачислены на баланс.");
+					return;
+				}
+				if (!bankProfile || bankProfile.tokenBalance < FARM_TOKEN_BATCH) {
+					setLocalizedText(exchangeStatus, "Для обмена нужно 100 ЖКХ-токенов.");
+					return;
+				}
+				const previousBalance = bankProfile.tokenBalance;
+				const previousCoins = state.coins;
+				bankProfile.tokenBalance -= FARM_TOKEN_BATCH;
+				bankData.wallets[playerId] = bankProfile.tokenBalance;
+				state.coins = Math.round((state.coins + 1000) * 1000) / 1000;
+				if (!saveBankData()) {
+					bankProfile.tokenBalance = previousBalance;
+					bankData.wallets[playerId] = previousBalance;
+					state.coins = previousCoins;
+					setLocalizedText(exchangeStatus, "Не удалось выполнить обмен: попробуй ещё раз.");
+					return;
+				}
+				saveState();
+				setLocalizedText(exchangeStatus, "Обмен выполнен: 1000 тап-коинов зачислены на баланс.");
+				render();
+			});
+			const transferCardInput = document.querySelector("#transferCardNumber");
+			transferCardInput.addEventListener("input", () => {
+				const digits = transferCardInput.value.replace(/\D/g, "").slice(0, 12);
+				transferCardInput.value = digits.replace(/(\d{4})(?=\d)/g, "$1 ");
+			});
+			document.querySelector("#bankTransferForm").addEventListener("submit", event => {
+				event.preventDefault();
+				const cardNumber = transferCardInput.value.replace(/\D/g, "");
+				const amount = Number(document.querySelector("#transferTokenAmount").value);
+				if (cloudMode) {
+					if (!/^8888\d{8}$/.test(cardNumber)) {
+						setLocalizedText(bankTransferStatus, "Введи полный номер карты из 12 цифр.");
+						return;
+					}
+					if (!Number.isSafeInteger(amount) || amount <= 0) {
+						setLocalizedText(bankTransferStatus, "Укажи целое количество токенов больше нуля.");
+						return;
+					}
+					dispatchCloudAction("transfer", { cardNumber, amount }, bankTransferStatus, `Переведено ${amount.toLocaleString(numberLocale())} ЖКХ-токенов.`);
+					document.querySelector("#transferTokenAmount").value = "";
+					transferCardInput.value = "";
+					return;
+				}
+				if (!/^8888\d{8}$/.test(cardNumber)) {
+					setLocalizedText(bankTransferStatus, "Введи полный номер карты из 12 цифр.");
+					return;
+				}
+				if (!Number.isSafeInteger(amount) || amount <= 0) {
+					setLocalizedText(bankTransferStatus, "Укажи целое количество токенов больше нуля.");
+					return;
+				}
+				const recipient = Object.entries(bankData.cards).find(([, number]) => number === cardNumber)?.[0];
+				if (!recipient) {
+					setLocalizedText(bankTransferStatus, "Карта не найдена среди карт, выпущенных в этом браузере.");
+					return;
+				}
+				if (recipient === playerId) {
+					setLocalizedText(bankTransferStatus, "Нельзя перевести токены самому себе.");
+					return;
+				}
+				if (!bankProfile || bankProfile.tokenBalance < amount) {
+					setLocalizedText(bankTransferStatus, "Недостаточно ЖКХ-токенов в кошельке.");
+					return;
+				}
+
+				const previousSenderBalance = bankProfile.tokenBalance;
+				const previousRecipientBalance = bankData.wallets[recipient] || 0;
+				bankProfile.tokenBalance -= amount;
+				bankData.wallets[playerId] = bankProfile.tokenBalance;
+				bankData.wallets[recipient] = previousRecipientBalance + amount;
+				if (!saveBankData()) {
+					bankProfile.tokenBalance = previousSenderBalance;
+					bankData.wallets[playerId] = previousSenderBalance;
+					bankData.wallets[recipient] = previousRecipientBalance;
+					setLocalizedText(bankTransferStatus, "Не удалось выполнить перевод: попробуй ещё раз.");
+					return;
+				}
+				document.querySelector("#transferTokenAmount").value = "";
+				setLocalizedText(bankTransferStatus, `Переведено ${amount.toLocaleString(numberLocale())} ЖКХ-токенов.`);
+				render();
+			});
 			document.querySelector("#playerId").textContent = playerId;
-			const referralUrl = new URL("jkhcoin", window.location.href);
-			referralUrl.searchParams.set("ref", playerId);
-			document.querySelector("#referralUrl").value = window.location.protocol === "file:"
-				? `jkhcoin?${referralUrl.searchParams.toString()}`
-				: referralUrl.toString();
-			document.querySelector("#profileName").textContent = telegramUser
-				? [telegramUser.first_name, telegramUser.last_name].filter(Boolean).join(" ") || telegramUser.username || "Игрок"
-				: "Игрок";
-			document.querySelector("#profileUsername").textContent = telegramUser?.username
-				? `@${telegramUser.username}`
-				: telegramUser ? "Профиль Telegram" : "Локальный профиль";
+			document.querySelector("#referralPlayerId").textContent = playerId;
+			const profileName = telegramUser
+				? [telegramUser.first_name, telegramUser.last_name].filter(Boolean).join(" ") || telegramUser.username
+				: "";
+			if (profileName) document.querySelector("#profileName").textContent = profileName;
+			else setLocalizedText(document.querySelector("#profileName"), "Игрок");
+			const nickname = telegramUser?.username ? `@${telegramUser.username}` : telegramUser?.first_name || "Игрок";
+			setLocalizedText(document.querySelector("#playerNickname"), nickname);
+			const usernameLabel = telegramUser?.username ? `@${telegramUser.username}` : telegramUser ? "Профиль Telegram" : "Локальный профиль";
+			setLocalizedText(document.querySelector("#profileUsername"), usernameLabel);
 			setAvatar("#avatarImage", "#avatarFallback");
 			setAvatar("#profileAvatarImage", "#profileAvatarFallback");
 			navButtons.forEach(button => button.addEventListener("click", () => openScene(button.dataset.target)));
 			document.querySelector("#profileTrigger").addEventListener("click", () => openScene("profile"));
-			document.querySelector("#copyReferral").addEventListener("click", async () => {
-				const input = document.querySelector("#referralUrl");
-				const status = document.querySelector("#copyStatus");
-				try {
-					await navigator.clipboard.writeText(input.value);
-				} catch {
-					input.focus();
-					input.select();
-					document.execCommand("copy");
+			document.querySelectorAll(".language-button").forEach(button => {
+				button.addEventListener("click", () => {
+					language = button.dataset.language === "en" ? "en" : "ru";
+					try {
+						localStorage.setItem(LANGUAGE_KEY, language);
+					} catch {
+						console.warn("Could not save the selected language.");
+					}
+					applyLanguage();
+					if (tonConnectInstance) tonConnectInstance.uiOptions = { language, uiPreferences: { theme: "DARK" } };
+					if (cloudMode) dispatchCloudAction("language", { language });
+					render();
+				});
+			});
+			let referralData = loadReferralData();
+			const referralCodeInput = document.querySelector("#referralCode");
+			const referralStatus = document.querySelector("#referralStatus");
+			const referralInput = document.querySelector("#referralInput");
+			const redeemReferralButton = document.querySelector("#redeemReferral");
+			let ownReferralCode = Object.entries(referralData.codes).find(([, record]) => record.ownerId === playerId)?.[0];
+			if (!ownReferralCode) {
+				do { ownReferralCode = createReferralCode(); } while (referralData.codes[ownReferralCode]);
+				referralData.codes[ownReferralCode] = { ownerId: playerId, usedBy: null };
+				if (!saveReferralData(referralData)) {
+					delete referralData.codes[ownReferralCode];
+					ownReferralCode = "";
 				}
-				status.textContent = "Ссылка скопирована";
+			}
+			referralCodeInput.value = ownReferralCode || "";
+			if (!ownReferralCode) {
+				setLocalizedText(referralStatus, "Не удалось сохранить код в этом браузере.");
+				referralInput.disabled = true;
+				redeemReferralButton.disabled = true;
+			} else if (referralData.referrals[playerId]) {
+				setLocalizedText(referralStatus, "Вы уже использовали код приглашения.");
+				referralInput.disabled = true;
+				redeemReferralButton.disabled = true;
+			}
+
+			document.querySelector("#copyReferralCode").addEventListener("click", async () => {
+				const status = document.querySelector("#copyStatus");
+				if (!referralCodeInput.value) {
+					setLocalizedText(status, "Код пока недоступен.");
+					return;
+				}
+				try {
+					await navigator.clipboard.writeText(referralCodeInput.value);
+				} catch {
+					referralCodeInput.focus();
+					referralCodeInput.select();
+					if (!document.execCommand("copy")) {
+						setLocalizedText(status, "Не удалось скопировать код. Выдели его и скопируй вручную.");
+						return;
+					}
+				}
+				setLocalizedText(status, "Код скопирован");
+			});
+			document.querySelector("#referralForm").addEventListener("submit", event => {
+				event.preventDefault();
+				const code = referralInput.value.trim();
+				if (!/^[A-Za-z0-9]{11}$/.test(code)) {
+					setLocalizedText(referralStatus, "Введи код из 11 латинских букв и цифр.");
+					return;
+				}
+				if (cloudMode) {
+					dispatchCloudAction("referral", { code }, referralStatus, "Код успешно применён!").then(() => {
+						if (cloudProfile?.referral.used) {
+							referralInput.disabled = true;
+							redeemReferralButton.disabled = true;
+							referralInput.value = "";
+						}
+					});
+					return;
+				}
+
+				referralData = loadReferralData();
+				if (referralData.referrals[playerId]) {
+					setLocalizedText(referralStatus, "Ты уже использовал код приглашения.");
+					referralInput.disabled = true;
+					redeemReferralButton.disabled = true;
+					return;
+				}
+				const invitation = referralData.codes[code];
+				if (!invitation) {
+					setLocalizedText(referralStatus, "Код не найден. В локальной версии доступны только коды из этого браузера.");
+					return;
+				}
+				if (invitation.ownerId === playerId) {
+					setLocalizedText(referralStatus, "Нельзя использовать собственный код.");
+					return;
+				}
+				if (invitation.usedBy) {
+					setLocalizedText(referralStatus, "Этот код уже использован.");
+					return;
+				}
+
+				invitation.usedBy = playerId;
+				referralData.referrals[playerId] = { inviterId: invitation.ownerId, code };
+				if (!saveReferralData(referralData)) {
+					invitation.usedBy = null;
+					delete referralData.referrals[playerId];
+					setLocalizedText(referralStatus, "Не удалось сохранить результат. Попробуй ещё раз.");
+					return;
+				}
+				referralInput.value = "";
+				referralInput.disabled = true;
+				redeemReferralButton.disabled = true;
+				setLocalizedText(referralStatus, "Код успешно применён!");
 			});
 			telegramApp?.BackButton?.onClick(() => openScene("home"));
 			telegramApp?.ready();
@@ -495,6 +1506,15 @@
 			setupTonConnect();
 
 			render();
+			applyLanguage();
+			if (cloudMode) {
+				window.setInterval(() => {
+					cloudActionQueue = cloudActionQueue.then(async () => {
+						cacheCloudProfile(await cloudRequest("profile/bootstrap", { legacy: null }));
+						render();
+					}).catch(error => showCloudNotice(error.message));
+				}, 30_000);
+			}
 			window.setInterval(render, 250);
 		})();
 	</script>
