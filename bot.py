@@ -2,10 +2,12 @@ import hashlib
 import hmac
 import os
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import AsyncIterator
 from urllib.parse import urlsplit
 
 from fastapi import FastAPI, Header, HTTPException, Request
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from telegram import (
     InlineKeyboardButton,
     InlineKeyboardMarkup,
@@ -14,10 +16,12 @@ from telegram import (
 )
 from telegram.ext import Application, CommandHandler, ContextTypes
 
+from game_api import initialize_database, router as game_router
 
+BASE_DIR = Path(__file__).resolve().parent
 WEB_APP_URL = "https://mishjkh.github.io/jkhcoin/"
 WELCOME_IMAGE_URL = (
-    "https://raw.githubusercontent.com/mishjkh/jkhcoin/main/photo_2026-11-01_18-17-22.jpg"
+    "https://mishjkh.github.io/jkhcoin/photo_2026-10-28_18-50-34.jpg"
 )
 
 telegram_application: Application | None = None
@@ -54,7 +58,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
-    global telegram_application
+    global telegram_application, WEB_APP_URL
 
     token = os.environ.get("BOT_TOKEN")
     public_url = os.environ.get("RENDER_EXTERNAL_URL", "").rstrip("/")
@@ -66,6 +70,8 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     if parsed_url.scheme != "https" or not parsed_url.netloc:
         raise RuntimeError("RENDER_EXTERNAL_URL must be the public HTTPS service URL.")
 
+    initialize_database()
+    WEB_APP_URL = f"{public_url}/"
     telegram_application = Application.builder().token(token).build()
     telegram_application.add_handler(CommandHandler("start", start))
     await telegram_application.initialize()
@@ -85,11 +91,56 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
 
 
 app = FastAPI(lifespan=lifespan)
+app.include_router(game_router)
 
 
 @app.get("/")
+async def web_app() -> HTMLResponse:
+    html = (BASE_DIR / "jkhcoin.html").read_text(encoding="utf-8")
+    html = html.replace(
+        "<head>",
+        '<head>\n\t<script>window.JKH_API_BASE = ""; window.JKH_CLOUD_MODE = true;</script>',
+        1,
+    )
+    return HTMLResponse(html)
+
+
+@app.get("/healthz")
 async def health_check() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.get("/tonconnect-manifest.json")
+async def tonconnect_manifest() -> JSONResponse:
+    base_url = os.environ.get("RENDER_EXTERNAL_URL", "").rstrip("/")
+    return JSONResponse(
+        {
+            "url": f"{base_url}/",
+            "name": "ЖКХ Коин",
+            "iconUrl": f"{base_url}/tonconnect-icon.png",
+        }
+    )
+
+
+@app.get("/{asset_name}")
+async def static_asset(asset_name: str) -> FileResponse:
+    allowed_assets = {
+        "jkhcoin.html",
+        "photo_2025-09-05_17-02-22.jpg",
+        "photo_2026-10-28_18-50-34.jpg",
+        "photo_2026-10-28_19-04-15.jpg",
+        "photo_2026-11-01_18-17-22.jpg",
+        "photo_2026-10-28_18-44-10.jpg",
+        "photo_2026-10-28_18-44-10 (2).jpg",
+        "photo_2026-11-10_14-05-57.jpg",
+        "tonconnect-icon.png",
+    }
+    if asset_name not in allowed_assets:
+        raise HTTPException(status_code=404, detail="File not found")
+    asset_path = BASE_DIR / asset_name
+    if not asset_path.is_file():
+        raise HTTPException(status_code=404, detail="File not found")
+    return FileResponse(asset_path)
 
 
 @app.post("/telegram")
